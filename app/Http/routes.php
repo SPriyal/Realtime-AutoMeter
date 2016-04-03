@@ -31,9 +31,6 @@ Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@Table
 //	echo "Entity id chosen is : ".$c;
 //});
 
-
-
-
 //<<<<<<<<<<<<<<--------------FOR TESTING PURPOSES ONLY-------------->>>>>>>>>>>>>>//
 // make a sample hierarchy in thr database
 Route::get('/makehierarchy',function(){
