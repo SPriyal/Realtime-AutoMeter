@@ -251,7 +251,9 @@
 
         <section class="content">
           <!-- Page Content -->
-          @yield('content')
+          @yield('contentfourbox')
+          @yield('contentLiveGraph')
+          @yield('contentDataTable')
         </section><!-- /.content -->
 
       </div><!-- /.content-wrapper -->

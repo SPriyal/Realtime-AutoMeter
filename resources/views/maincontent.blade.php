@@ -1,7 +1,6 @@
 @extends('pages.dashboard')
 
-@section('content')
-
+@section('contentfourbox')
 		<div class="box box-default">
 			<div class="box-header with-border">
 				<h3 class="box-title">Overall Statistics</h3>
@@ -64,8 +63,8 @@
 				</div><!-- /.row -->
 			</div><!-- /.box-body -->
 		</div><!-- /.box -->
-
-{{--                        MONTHLY RECAP REPORT CODE STARTS HERE                       --}}
+@endsection
+@section('contentLiveGraph')
 	<div class="row">
 		<div class="col-md-12">
 			<div class="box">
@@ -96,56 +95,47 @@
 					</div>
 				</div><!-- /.box-header -->
 				<div class="box-body">
-
-
 							<p class="text-center">
 								<strong>Sales: 1 Jan, 2014 - 30 Jul, 2014</strong>
 							</p>
 							<div id="chartContainer" style="height: 300px; min-width: 200px">
 							</div><!-- /.chart-responsive -->
-
-
-
 				</div><!-- ./box-body -->
-
 			</div><!-- /.box -->
 		</div><!-- /.col -->
 	</div><!-- /.row -->
-<div class="box">
-                    <div class="box-header">
-                      <h3 class="box-title">Data Table With Full Features</h3>
-                    </div><!-- /.box-header -->
-                    <div class="box-body">
-                      <table id="example1" class="table table-bordered table-striped">
-                        <thead>
-                          <tr>
+@endsection
+@section('contentDataTable')
+		<div class="box">
+			<div class="box-header">
+				<h3 class="box-title">Data Table With Full Features</h3>
+			</div><!-- /.box-header -->
+			<div class="box-body">
+				<table id="example1" class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th>Number</th>
+							<th>Parameter Name</th>
+							<th>Value</th>
+							<th>DateTime</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php echo $dataForTable;  ?>
+					</tbody>
+					<tfoot>
+						<tr>
                             <th>Number</th>
                             <th>Parameter Name</th>
                             <th>Value</th>
                             <th>DateTime</th>
-
-                          </tr>
-                        </thead>
-                        <tbody>
-
-                            <?php echo $dataForTable;  ?>
-
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                            <th>Number</th>
-                            <th>Parameter Name</th>
-                            <th>Value</th>
-                            <th>DateTime</th>
-
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div><!-- /.box-body -->
-                  </div><!-- /.box -->
+						</tr>
+					</tfoot>
+				</table>
+			</div><!-- /.box-body -->
+		</div><!-- /.box -->
                 </div><!-- /.col -->
               </div><!-- /.row -->
             </section><!-- /.content -->
           </div><!-- /.content-wrapper -->
-
 @endsection
