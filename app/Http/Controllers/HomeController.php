@@ -1,0 +1,199 @@
+<?php namespace App\Http\Controllers;
+
+use App\Company;
+use DB;
+use App\testdata as testdata;
+use App\Data as Data;
+class HomeController extends Controller
+{
+
+    /*
+    |--------------------------------------------------------------------------
+    | Home Controller
+    |--------------------------------------------------------------------------
+    |
+    | This controller renders the application's "dashboard" for users that
+    | are authenticated. Authentication is provided by the middleware in
+    | in the constructor.
+    |
+    *
+
+    /**
+     * Create a new controller instance.
+     *
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+        $html = $this->getHtmlForHierarchy(); //for left navigation
+        $dataForPreviousValues = $this->PreviousValues(); //for live graph
+        $dataForTable = $this->TableValue(4); //for Table
+        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
+    }
+    public function TableFromHierarchy($nodeId)
+    {
+        $dataForTable = $this->TableValue($nodeId);
+        $html = $this->getHtmlForHierarchy(); //for left navigation
+        $dataForPreviousValues = $this->PreviousValues(); //for live graph
+//        echo $dataForPreviousValues;
+        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
+    }
+
+    // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ----------------------------
+
+    /**
+     * Recursive function that returns tree for a given node.
+     * Specially made for AdminLTE
+     *
+     * @param $node
+     */
+    public function renderNode($node)
+    {
+        global $html;
+
+        if ($node->children()->count() > 0) {
+            $html = $html . "<li class='treeview'>"
+                          . "<a href='#'><i class='fa fa-circle'></i><span>{$node->name}</span>"
+                          . "<i class='fa fa-angle-left pull-right'></i></a>"
+                          . "<ul class='treeview-menu'>";
+
+            foreach ($node->children as $child)
+                $this->renderNode($child);
+
+            $html = $html . "</ul>";
+        } else {
+            $html = $html . "<li>"
+                          . "<a href='/"
+                          .env('URL_ENTITY', 'auto')
+                          ."/{$node->id}'><span>{$node->name}</span></a>";
+        }
+
+        $html = $html . "</li>";
+    }
+
+    /**
+     * Generate html for hierarchy from a given collection of nested arrays.
+     * Specially made for AdminLTE.
+     *
+     * @return string
+     * @internal param $companyHierarchyCollection
+     */
+    public function getHtmlForHierarchy() {
+
+        //get the descendants of the given company for sidebar hierarchy into a collection
+        $companyHierarchyCollection = Company::where('name', '=', 'AutoSoft Corp.')
+                                        ->first()->getDescendants()->toHierarchy();
+
+        global $html;
+        foreach ($companyHierarchyCollection as $root) {
+            $html = $html . $this->renderNode($root);
+        }
+
+        return $html;
+    }
+
+    // -----------------------LEFT NAVIGATION HIERARCHY CODE Finish ----------------------------
+
+    // -----------------------GRAPH REQUIRED CODE BELOW ----------------------------------------
+    public function PreviousValues()
+    {
+        date_default_timezone_set('Asia/Kolkata');
+
+        $shiftCheckResult = $this->shiftCheck();
+        $GLOBALS['$shiftCheckResult'] = $this->shiftCheck();
+        $nowTime = strtotime('now');
+        if ($shiftCheckResult == "day") {
+            $morningShiftTime = strtotime(date("Y-m-d") . "09:00:00");
+            $tenMinutesAfterMorningShiftTime = strtotime(date("Y-m-d") . "09:10:00");
+            if ($nowTime >= $morningShiftTime && $nowTime <= $tenMinutesAfterMorningShiftTime)
+                $previousValueData = $this->fetchData("08:45:00");
+            else
+                $previousValueData = $this->fetchData("09:00:00");
+        } else if ($shiftCheckResult == "night" || $shiftCheckResult == "midnight") {
+            $nightShiftTime = strtotime(date("Y-m-d") . "21:00:00");
+            $tenMinutesAfterNightShiftTime = strtotime(date("Y-m-d") . "21:10:00");
+            if ($nowTime >= $nightShiftTime && $nowTime <= $tenMinutesAfterNightShiftTime)
+                $previousValueData = $this->fetchData("20:45:00");
+            else
+                $previousValueData = $this->fetchData("21:00:00");
+        }
+
+        return $previousValueData;
+        //return view('graphs.index',compact('dataForPreviousValues'));
+    }
+
+    public function LiveValues()
+    {
+        $query =  testdata::where('dateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('dateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
+        return json_encode($query);
+    }
+
+    public function shiftCheck()
+    {
+        $shiftCheckResult = "";
+        $starttime = strtotime(date("Y-m-d") . "09:00:00");
+        $endtime = strtotime(date("Y-m-d") . "21:00:00");
+        $currenttime = strtotime('now');
+        $nextstarttime = strtotime(date('Y-m-d', strtotime(' +1 day')) . "09:00:00");
+        if ($currenttime >= $starttime && $currenttime < $endtime) {
+            return "day";
+        } else if ($currenttime >= $endtime) {
+            return "night";
+        } else if ($currenttime < $nextstarttime)
+            return "midnight";
+        else
+            return "error!";
+    }
+
+    /**
+     * @param $RequiredStartTimeOfShift
+     */
+    public function fetchData($RequiredStartTimeOfShift)
+    {
+
+        if ($GLOBALS['$shiftCheckResult'] == "midnight")
+            $dateVariable = date('Y-m-d', strtotime(' -1 day')) . " " . $RequiredStartTimeOfShift;  //I need to figure out this, '-1 day' that why have i used...
+        else
+            $dateVariable = date("Y-m-d") . " " . $RequiredStartTimeOfShift;
+
+        $now = date('Y-m-d H:i:s');
+
+        $sql = testdata::whereBetween('dateTime',[$dateVariable,$now])->get();
+
+        return $sql;
+
+    }
+
+    public function testing($data)
+    {
+        echo "In the condata is ".$data;
+    }
+
+    // ----------------------- GRAPH CODE Finish------------------------------------------------
+
+    public function TableValue($meterIdFromHierarchy)
+    {
+        $query = Data::select('parameter_name','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
+        $html1 = '';
+        for($a = 0; $a<sizeof($query); $a++) {
+            $html1 = $html1 . ' <tr>';
+            $html1 = $html1 . '<td>'. ($a+'1') .'</td>';
+            $html1 = $html1 . '<td>'. $query[$a]['parameter_name'] .'</td>';
+            $html1 = $html1 . '<td>'. $query[$a]['value'] .'</td>';
+            $html1 = $html1 . '<td>'. $query[$a]['DateTime'] .'</td>';
+            $html1 = $html1 . ' </tr>';
+        }
+        return $html1;
+    }
+
+
+}

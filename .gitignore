@@ -1,0 +1,7 @@
+/vendor
+/node_modules
+.env
+
+.idea/workspace.xml
+
+Archive.zip
