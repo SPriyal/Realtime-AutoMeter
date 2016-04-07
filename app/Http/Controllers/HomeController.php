@@ -1,9 +1,16 @@
 <?php namespace App\Http\Controllers;
 
 use App\Company;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Input;
+use File;
+use Validator;
+use Illuminate\Support\Facades\Session as Session;
 use DB;
 use App\testdata as testdata;
 use App\Data as Data;
+
 class HomeController extends Controller
 {
 
@@ -39,6 +46,81 @@ class HomeController extends Controller
         $dataForTable = $this->TableValue(4); //for Table
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }
+
+    public function processAdminPanelNewCompany(Request $request){
+        $newFile = $request->file('newCompanyCsvFile');
+        $newCompanyName = $request->get('newCompanyName');
+//        $rules = array('newCompanyCsvFile' => 'required',);
+//        $validator = Validator::make($newFile, $rules);
+//        if ($validator->fails()) {
+//            // send back to the page with the input data and errors
+//            return Redirect::to('upload')->withInput()->withErrors($validator);
+//        }
+//        else
+        {
+            if ($newFile->isValid()) {
+                $extension = $newFile->getClientOriginalExtension(); // getting extension
+                $nowDateTime = new \DateTime();
+                $fileName = $newCompanyName.'_'.$nowDateTime->getTimestamp().'.'.$extension;
+                Storage::disk('local')->put($fileName,  File::get($newFile));
+                Session::flash('success', 'Upload successfully');
+//              Some variable initializations
+                $i=0;
+                foreach(file($newFile) as $line){
+                    $companyFileArray[$i] = $line;
+                    $i++;
+                }
+                for($i=0;$i<sizeof($companyFileArray);$i++){
+                    $companyDetailsIn2dArray[$i] =str_getcsv($companyFileArray[$i]);
+                }
+
+                $root = Company::create(['name' => $newCompanyName]);   //Creating node
+                $root->makeRoot();  //Making Root Node
+                for($i=0;$i<sizeof($companyDetailsIn2dArray);$i++){
+                    if($companyDetailsIn2dArray[$i][0]!=""){
+                        $this->addNewCompanyNode($root,$i,0,$companyDetailsIn2dArray);
+                    }
+                }
+                echo "File Parsed Successfully!";
+            }
+            else {
+                // sending back with error message.
+                Session::flash('error', 'uploaded file is not valid');
+            }
+        }
+    }
+
+    public function addNewCompanyNode($root,$I,$J,$contentForNode){
+        $newNode[$I][$J] = Company::create(['name' => $contentForNode[$I][$J]]);
+        $newNode[$I][$J]->makeChildOf($root);
+        $childrenListForCurrentNode = $this->findChildNodeOfCurrentNode($I,$J,$contentForNode);
+        for($n=0;$n<sizeof($childrenListForCurrentNode);$n++){
+            $this->addNewCompanyNode($newNode[$I][$J],$childrenListForCurrentNode[$n],$J+1,$contentForNode);
+        }
+    }
+
+    public function findChildNodeOfCurrentNode($i,$j,$contentForNode){
+        $childrenLocationArray = array();
+        if($j+1<sizeof($contentForNode[$i])) {
+            if ($contentForNode[$i][$j + 1] != "") {
+                array_push($childrenLocationArray, $i);
+            }
+        }
+        for($m=$i+1;$m<sizeof($contentForNode);$m++){
+            if($contentForNode[$m][$j] == ""){
+                if($j+1<sizeof($contentForNode[$i])) {
+                    if ($contentForNode[$m][$j + 1] != "") {
+                        array_push($childrenLocationArray, $m);
+                    }
+                }
+            }
+            else{
+                break;
+            }
+        }
+        return $childrenLocationArray;
+    }
+
     public function TableFromHierarchy($nodeId)
     {
         $dataForTable = $this->TableValue($nodeId);
@@ -49,6 +131,7 @@ class HomeController extends Controller
     }
 
     // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ----------------------------
+
 
     /**
      * Recursive function that returns tree for a given node.

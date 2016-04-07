@@ -1,6 +1,34 @@
 @extends('pages.dashboard')
 
 @section('contentFourBox')
+
+        <div class="box box-default">
+			<div class="box-header with-border">
+				<h3 class="box-title">Admin Panel</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				</div><!-- /.box-tools -->
+			</div><!-- /.box-header -->
+			<div class="box-body">
+				{{--<- Live data Here ->--}}
+				<!-- Small boxes (Stat box) -->
+				<div class="row">
+					<div class="col-lg-3 col-xs-6">
+                        {!! Form::open(array('url'=>'adminPanel/Process','method'=>'POST', 'files'=>true)) !!}
+                        {!! Form::text('newCompanyName',null,['class' => 'form-control' ]) !!}
+                        <br/>
+                        {!! Form::file('newCompanyCsvFile') !!}
+                        <p class="errors">{!!$errors->first('image')!!}</p>
+                        @if(Session::has('error'))
+                        <p class="errors">{!! Session::get('error') !!}</p>
+                        @endif
+                        {!! Form::submit('Submit', array('class'=>'btn btn-primary')) !!}
+                        {!!Form::close()!!}
+					</div><!-- ./col -->
+				</div><!-- /.row -->
+			</div><!-- /.box-body -->
+		</div><!-- /.box -->
+
 		<div class="box box-default">
 			<div class="box-header with-border">
 				<h3 class="box-title">Overall Statistics</h3>

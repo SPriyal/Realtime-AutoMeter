@@ -15,6 +15,8 @@ Route::get('home', 'HomeController@index');
 
 Route::get('/' , 'Auth\AuthController@getLogin' ) ;
 
+Route::post('adminPanel/Process','HomeController@processAdminPanelNewCompany');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
@@ -35,37 +37,37 @@ Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@Table
 // make a sample hierarchy in thr database
 Route::get('/makehierarchy',function(){
 
-	$categories = [
-		['id' => 1, 'name' => 'AutoSoft Corp.', 'children' => [
-			['id' => 2, 'name' => 'Dept 1 : Spinning', 'children' => [
-				['id' => 3, 'name' => 'Machine 1 : Dyeing', 'children' => [
-					['id' => 4, 'name' => 'Meter 1'],
-					['id' => 5, 'name' => 'Meter 2']
-				]],
-				['id' => 6, 'name' => 'Machine 2 : Printing', 'children' => [
-					['id' => 14, 'name' => 'Meter 1'],
-					['id' => 15, 'name' => 'Meter 2']
-				]],
-				[ 'name' => 'Machine 3 : Printing3', 'children' => [
-					['name' => 'Meter 1'],
-					['name' => 'Meter 2']
-				]],
-			]],
-			['id' => 7, 'name' => 'Dept 2 : Knitting', 'children' => [
-				['id' => 8, 'name' => 'Machine 1 : Dyeing', 'children' => [
-					['id' => 9, 'name' => 'Meter 1'],
-					['id' => 10, 'name' => 'Meter 2']
-				]],
-				['id' => 11, 'name' => 'Machine 2 : Printing']
-			]],
-			['id' => 12, 'name' => 'Dept 3 : Finishing'],
-			['id' => 13, 'name' => 'Dept 4 : Testing']
-		]],
-	];
+    $categories = [
+        ['id' => 1, 'name' => 'AutoSoft Corp.', 'children' => [
+            ['id' => 2, 'name' => 'Dept 1 : Spinning', 'children' => [
+                ['id' => 3, 'name' => 'Machine 1 : Dyeing', 'children' => [
+                    ['id' => 4, 'name' => 'Meter 1'],
+                    ['id' => 5, 'name' => 'Meter 2']
+                ]],
+                ['id' => 6, 'name' => 'Machine 2 : Printing', 'children' => [
+                    ['id' => 7, 'name' => 'Meter 1'],
+                    ['id' => 8, 'name' => 'Meter 2']
+                ]],
+                [ 'name' => 'Machine 3 : Printing3', 'children' => [
+                    ['name' => 'Meter 1'],
+                    ['name' => 'Meter 2']
+                ]],
+            ]],
+            ['id' => 14, 'name' => 'Dept 2 : Knitting', 'children' => [
+                ['id' => 15, 'name' => 'Machine 1 : Dyeing', 'children' => [
+                    ['id' => 9, 'name' => 'Meter 1'],
+                    ['id' => 10, 'name' => 'Meter 2']
+                ]],
+                ['id' => 11, 'name' => 'Machine 2 : Printing']
+            ]],
+            ['id' => 12, 'name' => 'Dept 3 : Finishing'],
+            ['id' => 13, 'name' => 'Dept 4 : Testing']
+        ]],
+    ];
 
-	\App\Company::buildTree($categories); // => true
+    \App\Company::buildTree($categories); // => true
 
-	DB::insert('insert into users (name, email, password, remember_token, created_at, updated_at) values (?, ?, ?, ?, ?, ?)', ['demo','demo@demo.com','$2y$10$cJvsjnFNHwtn86kKAr.XYOHsNiCef42IM./ZDwiF9r1S/CSP/Skfm','dGGve9piPpxj94WDsjTHdE1EuuewI7Ki52LdrsQ1rQDbrnAJ5kz6R7hfEafN','2015-09-14 10:37:31','2015-09-14 12:11:45']);
+    //DB::insert('insert into users (name, email, password, remember_token, created_at, updated_at) values (?, ?, ?, ?, ?, ?)', ['demo','demo@demo.com','$2y$10$cJvsjnFNHwtn86kKAr.XYOHsNiCef42IM./ZDwiF9r1S/CSP/Skfm','dGGve9piPpxj94WDsjTHdE1EuuewI7Ki52LdrsQ1rQDbrnAJ5kz6R7hfEafN','2015-09-14 10:37:31','2015-09-14 12:11:45']);
 
 });
 
