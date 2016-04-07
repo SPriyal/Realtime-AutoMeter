@@ -130,7 +130,7 @@ class HomeController extends Controller
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }
 
-    // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ----------------------------
+    // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW -------------------------------
 
 
     /**
