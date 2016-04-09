@@ -50,8 +50,12 @@ class HomeController extends Controller
 
 //    =============================New Company Insertion from CSV Parser Code BELOW==================================
     public function processAdminPanelNewCompany(Request $request){
+        date_default_timezone_set('Asia/Kolkata');
+        $nowDateTime = date("d_m_Y-H_i_s");
         $newFile = $request->file('newCompanyCsvFile');
         $newCompanyName = $request->get('newCompanyName');
+//        $newCompanyCsvFileName = $request->get('newCompanyCsvFileName') ;
+//        echo "Company name is :".$newCompanyName.":...";
 //        $rules = array('newCompanyCsvFile' => 'required',);
 //        $validator = Validator::make($newFile, $rules);
 //        if ($validator->fails()) {
@@ -59,11 +63,11 @@ class HomeController extends Controller
 //            return Redirect::to('upload')->withInput()->withErrors($validator);
 //        }
 //        else
+        if($newCompanyName!="")
         {
             if ($newFile->isValid()) {
                 $extension = $newFile->getClientOriginalExtension(); // getting extension
-                $nowDateTime = new \DateTime();
-                $fileName = $newCompanyName.'_'.$nowDateTime->getTimestamp().'.'.$extension;
+                $fileName = $newCompanyName.'_'.$nowDateTime.'.'.$extension;
                 Storage::disk('local')->put($fileName,  File::get($newFile));
                 Session::flash('success', 'Upload successfully');
 //              Some variable initializations
@@ -75,12 +79,12 @@ class HomeController extends Controller
                 for($i=0;$i<sizeof($companyFileArray);$i++){
                     $companyDetailsIn2dArray[$i] =str_getcsv($companyFileArray[$i]);
                 }
-
-                $root = Company::create(['name' => $newCompanyName]);   //Creating node
+                $csvPath = $newCompanyName . '/';
+                $root = Company::create(['name' => $newCompanyName, 'csvFilePath' => $csvPath]);   //Creating node
                 $root->makeRoot();  //Making Root Node
                 for($i=0;$i<sizeof($companyDetailsIn2dArray);$i++){
                     if($companyDetailsIn2dArray[$i][0]!=""){
-                        $this->addNewCompanyNode($root,$i,0,$companyDetailsIn2dArray);
+                        $this->addNewCompanyNode($root,$i,0,$companyDetailsIn2dArray,$csvPath);
                     }
                 }
                 echo "File Parsed Successfully!";
@@ -91,12 +95,12 @@ class HomeController extends Controller
             }
         }
     }
-    public function addNewCompanyNode($root,$I,$J,$contentForNode){
-        $newNode[$I][$J] = Company::create(['name' => $contentForNode[$I][$J]]);
+    public function addNewCompanyNode($root,$I,$J,$contentForNode,$csvPath){
+        $newNode[$I][$J] = Company::create(['name' => $contentForNode[$I][$J], 'csvFilePath' => $csvPath]);
         $newNode[$I][$J]->makeChildOf($root);
         $childrenListForCurrentNode = $this->findChildNodeOfCurrentNode($I,$J,$contentForNode);
         for($n=0;$n<sizeof($childrenListForCurrentNode);$n++){
-            $this->addNewCompanyNode($newNode[$I][$J],$childrenListForCurrentNode[$n],$J+1,$contentForNode);
+            $this->addNewCompanyNode($newNode[$I][$J],$childrenListForCurrentNode[$n],$J+1,$contentForNode,$csvPath);
         }
     }
     public function findChildNodeOfCurrentNode($i,$j,$contentForNode){
@@ -164,7 +168,7 @@ class HomeController extends Controller
     public function getHtmlForHierarchy() {
 
         //get the descendants of the given company for sidebar hierarchy into a collection
-        $companyHierarchyCollection = Company::where('name', '=', 'AutoSoft Corp.')
+        $companyHierarchyCollection = Company::where('name', '=', 'N2P2 Pvt. Ltd.')
                                         ->first()->getDescendants()->toHierarchy();
 
         global $html;
@@ -248,9 +252,9 @@ class HomeController extends Controller
 
 
 
-    public function testing($data)
+    public function testing()
     {
-        echo "In the condata is ".$data;
+        return view('pages.mapping');
     }
 
 
@@ -266,7 +270,7 @@ class HomeController extends Controller
     }
     public function TableValue($meterIdFromHierarchy)
     {
-        $query = Data::select('parameter_name','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
+        $query = Data::select('parameter_id','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
         $html1 = '';
         for($a = 0; $a<sizeof($query); $a++) {
             $html1 = $html1 . ' <tr>';

@@ -15,7 +15,7 @@
 				<div class="row">
 					<div class="col-lg-3 col-xs-6">
                         {!! Form::open(array('url'=>'adminPanel/Process','method'=>'POST', 'files'=>true)) !!}
-                        {!! Form::text('newCompanyName',null,['class' => 'form-control' ]) !!}
+                        {!! Form::text('newCompanyName',null,array('placeholder' => 'Enter Company Name', 'class' => 'form-control')) !!}
                         <br/>
                         {!! Form::file('newCompanyCsvFile') !!}
                         <p class="errors">{!!$errors->first('image')!!}</p>
