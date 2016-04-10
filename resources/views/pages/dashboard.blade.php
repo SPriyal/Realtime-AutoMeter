@@ -26,6 +26,8 @@
       <script src="{{ asset ("/bower_components/admin-lte/plugins/jQuery/jQuery-2.1.4.min.js") }}"></script>
     		{{--<style type="text/css">${demo.css}</style>--}}
       @yield('contentLiveGraphHead')
+
+
   </head>
 
   <body class="skin-blue sidebar-mini">

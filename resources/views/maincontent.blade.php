@@ -171,7 +171,10 @@
 			{{----}}
 //                    document.writeln(feedback);
 			var feedbackLength = feedback.length;
-			datePreviouslyTaken = Date.createFromMysql(feedback[feedbackLength - 1].dateTime);
+			datePreviouslyTaken = Date.createFromMysql(feedback[feedbackLength - 1].DateTime);
+
+//            document.writeln("<br/>data is <br/>"+feedback[0].DateTime);
+                /*===============Multiparameter code... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]===========
 			var parameterName = "kWH";
 			//Following will check if URL parameter exits or not.
 			var field = 'pname';
@@ -191,6 +194,8 @@
 			else
 				parameterName = "kWH";
 			//document.writeln(feedback[1].kWH);
+			*/
+
 			Highcharts.setOptions({
 				global : {
 					useUTC : false
@@ -213,12 +218,13 @@
 								}).success(function(){
 									setTimeout(function(){get_fb_success();}, 500);
 								}).responseText;
-								//document.write("<br>feedback is " + feedbackLive  );
+								document.write("<br>feedback is " + feedbackLive  );
 								function get_fb_success() {
 									if(feedbackLive != "[]")
 									{
 										feedbackLive = JSON.parse(feedbackLive);
 										var graphJSONincrementer = 0;
+                /*================Tiles Code... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]================
 										//Folowing is to initialize HTML elements with particular ids, so as to prevent error!
 										window.onload = settingElements();
 										function settingElements() {
@@ -227,11 +233,14 @@
 											document.getElementById("degreeC").innerHTML = parseInt(feedbackLive[graphJSONincrementer].degreeC);
 											document.getElementById("bar").innerHTML = parseInt(feedbackLive[graphJSONincrementer].bar);
 											document.getElementById("kwhMoney").innerHTML = (parseInt(feedbackLive[graphJSONincrementer].kWH)*6.986).toFixed(2);
-										}
+										}*/
+										document.write("<br>feedback is " + feedbackLive.DateTime  );
 										//Following will check, if value is missed or not with the help of date... If missed then the page will be reloaded.
-										dateCurrentOne = Date.createFromMysql(feedbackLive[graphJSONincrementer].dateTime);
+										dateCurrentOne = Date.createFromMysql(feedbackLive[graphJSONincrementer].DateTime);
 										var subDate = dateCurrentOne - datePreviouslyTaken;
 										if(subDate <15500)  {
+                /*====================MultiParameter Code.... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]============
+
 											if(parameterName == "kWH") {
 												var x = Number(Date.createFromMysql(feedbackLive[graphJSONincrementer].dateTime)), // current time
 														y = feedbackLive[graphJSONincrementer].kWH;
@@ -245,6 +254,9 @@
 												var x = Number(Date.createFromMysql(feedbackLive[graphJSONincrementer].dateTime)), // current time
 														y = feedbackLive[graphJSONincrementer].bar;
 											}
+											*/
+                                            var x = Number(Date.createFromMysql(feedbackLive[graphJSONincrementer].DateTime)), // current time
+                                                y = feedbackLive[graphJSONincrementer].value;
 											series.addPoint([x, y], true, true);
 											graphJSONincrementer++;
 											datePreviouslyTaken = dateCurrentOne;
@@ -299,9 +311,11 @@
 				},
 
 				series : [{
-					name : parameterName,
+					name : 'Test',
 					data : (function () {
 						// generate graph for previousData
+
+            /*=================Tiles Code... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]================
 						window.onload = settingElements(); //Sets Tile values to the latest recent value
 						function settingElements() {
 							document.getElementById("kwh").innerHTML = parseInt(feedback[feedbackLength - 1].kWH);
@@ -310,10 +324,12 @@
 							document.getElementById("bar").innerHTML = parseInt(feedback[feedbackLength - 1].bar);
 							document.getElementById("kwhMoney").innerHTML = (parseInt(feedback[feedbackLength - 1].kWH)*6.986).toFixed(2);
 						}
+						*/
 
 						var data = [], i;
 						//Pushes values/data to graph to display
 						for (i = -(feedbackLength-1),j=0; i <= 0 ; i += 1,j++) {
+            /*==================Multiple Parameter code... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]==============
 							if(parameterName == "kWH") {
 								data.push([
 									Number(Date.createFromMysql(feedback[j].dateTime)),
@@ -335,6 +351,11 @@
 									parseInt(feedback[j].bar)
 								]);
 							}
+							*/
+							data.push([
+                                Number(Date.createFromMysql(feedback[j].DateTime)),
+                                parseInt(feedback[j].value)
+                            ]);
 						}
 						return data;
 					}())
