@@ -47,6 +47,8 @@ class HomeController extends Controller
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }
 
+
+//    =============================New Company Insertion from CSV Parser Code BELOW==================================
     public function processAdminPanelNewCompany(Request $request){
         $newFile = $request->file('newCompanyCsvFile');
         $newCompanyName = $request->get('newCompanyName');
@@ -89,7 +91,6 @@ class HomeController extends Controller
             }
         }
     }
-
     public function addNewCompanyNode($root,$I,$J,$contentForNode){
         $newNode[$I][$J] = Company::create(['name' => $contentForNode[$I][$J]]);
         $newNode[$I][$J]->makeChildOf($root);
@@ -98,7 +99,6 @@ class HomeController extends Controller
             $this->addNewCompanyNode($newNode[$I][$J],$childrenListForCurrentNode[$n],$J+1,$contentForNode);
         }
     }
-
     public function findChildNodeOfCurrentNode($i,$j,$contentForNode){
         $childrenLocationArray = array();
         if($j+1<sizeof($contentForNode[$i])) {
@@ -120,19 +120,10 @@ class HomeController extends Controller
         }
         return $childrenLocationArray;
     }
-
-    public function TableFromHierarchy($nodeId)
-    {
-        $dataForTable = $this->TableValue($nodeId);
-        $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(); //for live graph
-//        echo $dataForPreviousValues;
-        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
-    }
-
-    // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ---------------------------------
+//    =============================New Company Insertion from CSV Parser Code FINISH==================================
 
 
+    // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ----------------------------
     /**
      * Recursive function that returns tree for a given node.
      * Specially made for AdminLTE
@@ -162,7 +153,6 @@ class HomeController extends Controller
 
         $html = $html . "</li>";
     }
-
     /**
      * Generate html for hierarchy from a given collection of nested arrays.
      * Specially made for AdminLTE.
@@ -183,8 +173,9 @@ class HomeController extends Controller
 
         return $html;
     }
-
     // -----------------------LEFT NAVIGATION HIERARCHY CODE Finish ----------------------------
+
+
 
     // -----------------------GRAPH REQUIRED CODE BELOW ----------------------------------------
     public function PreviousValues()
@@ -213,13 +204,11 @@ class HomeController extends Controller
         return $previousValueData;
         //return view('graphs.index',compact('dataForPreviousValues'));
     }
-
     public function LiveValues()
     {
         $query =  testdata::where('dateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('dateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
         return json_encode($query);
     }
-
     public function shiftCheck()
     {
         $shiftCheckResult = "";
@@ -236,7 +225,6 @@ class HomeController extends Controller
         else
             return "error!";
     }
-
     /**
      * @param $RequiredStartTimeOfShift
      */
@@ -255,14 +243,26 @@ class HomeController extends Controller
         return $sql;
 
     }
+    // ----------------------- GRAPH CODE Finish------------------------------------------------
+
+
 
     public function testing($data)
     {
         echo "In the condata is ".$data;
     }
 
-    // ----------------------- GRAPH CODE Finish------------------------------------------------
 
+
+//    =========================Table Generation Code BELOW======================================
+    public function TableFromHierarchy($nodeId)
+    {
+        $dataForTable = $this->TableValue($nodeId);
+        $html = $this->getHtmlForHierarchy(); //for left navigation
+        $dataForPreviousValues = $this->PreviousValues(); //for live graph
+//        echo $dataForPreviousValues;
+        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
+    }
     public function TableValue($meterIdFromHierarchy)
     {
         $query = Data::select('parameter_name','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
@@ -277,6 +277,6 @@ class HomeController extends Controller
         }
         return $html1;
     }
-
+//    =========================Table Generation Code FINISH======================================
 
 }
