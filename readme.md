@@ -1,3 +1,11 @@
+## Realtime Autometer project
+Live Data monitoring software.
+
+please fork and then clone this project to contribute.
+Make a new branch and submit new pull request for review.
+
+More about the framework on which we have build this project :
+
 ## Laravel PHP Framework
 
 [![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
