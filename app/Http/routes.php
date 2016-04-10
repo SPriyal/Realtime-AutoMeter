@@ -17,6 +17,12 @@ Route::get('/' , 'Auth\AuthController@getLogin' ) ;
 
 Route::post('adminPanel/Process','HomeController@processAdminPanelNewCompany');
 
+//==================Mapping related routes BELOW [parameter & csvDataColumn mappings]==================
+Route::get('mapping','MappingController@mappingIndexPage');
+Route::post('mapping/Selection','MappingController@mappingSelectionPage');
+Route::post('mapping/Selection/Submit','MappingController@mappingSubmit');
+//==================Mapping related routes FINISH [parameter & csvDataColumn mappings]==================
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
