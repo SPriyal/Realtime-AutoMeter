@@ -31,7 +31,7 @@ Route::controllers([
 Route::get('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@getLogin'));
 Route::post('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@postLogin'));
 Route::get('/logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@getLogout'));
-Route::post('/liveGraphValues', 'HomeController@LiveValues');
+Route::post('liveGraphValues', 'HomeController@LiveValues');
 //Show live graph if a meter name is clicked
 Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@TableFromHierarchy']);
 //Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c){$data['c'] = $c;return View::make('maincontent', $data);});
