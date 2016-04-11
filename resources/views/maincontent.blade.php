@@ -218,7 +218,7 @@
 								}).success(function(){
 									setTimeout(function(){get_fb_success();}, 500);
 								}).responseText;
-								document.write("<br>feedback is " + feedbackLive  );
+//								document.write("<br>feedback is " + feedbackLive  );
 								function get_fb_success() {
 									if(feedbackLive != "[]")
 									{
@@ -234,7 +234,10 @@
 											document.getElementById("bar").innerHTML = parseInt(feedbackLive[graphJSONincrementer].bar);
 											document.getElementById("kwhMoney").innerHTML = (parseInt(feedbackLive[graphJSONincrementer].kWH)*6.986).toFixed(2);
 										}*/
-										document.write("<br>feedback is " + feedbackLive.DateTime  );
+//										document.write("<br>feedback is " + feedbackLive[graphJSONincrementer].DateTime  );
+//										document.write("<br>feedback is " + feedbackLive[graphJSONincrementer].value  );
+//										document.write("<br>feedback is " + Number(feedbackLive[graphJSONincrementer].value)  );
+//
 										//Following will check, if value is missed or not with the help of date... If missed then the page will be reloaded.
 										dateCurrentOne = Date.createFromMysql(feedbackLive[graphJSONincrementer].DateTime);
 										var subDate = dateCurrentOne - datePreviouslyTaken;
@@ -256,7 +259,7 @@
 											}
 											*/
                                             var x = Number(Date.createFromMysql(feedbackLive[graphJSONincrementer].DateTime)), // current time
-                                                y = feedbackLive[graphJSONincrementer].value;
+                                                y = Number(feedbackLive[graphJSONincrementer].value);
 											series.addPoint([x, y], true, true);
 											graphJSONincrementer++;
 											datePreviouslyTaken = dateCurrentOne;
@@ -264,7 +267,7 @@
 										else
 											location.reload();
 									}
-								}}, 4000);
+								}}, 3000);
 						}
 					}
 				},

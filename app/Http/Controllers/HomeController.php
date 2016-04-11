@@ -210,7 +210,7 @@ class HomeController extends Controller
     }
     public function LiveValues()
     {
-        $query =  Data::where('meter_id','=','3')->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
+        $query =  Data::where('meter_id','=','18')->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
         return json_encode($query);
     }
     public function shiftCheck()
@@ -242,7 +242,7 @@ class HomeController extends Controller
 
         $now = date('Y-m-d H:i:s');
 
-        $sql = Data::where('meter_id','=','3')->whereBetween('DateTime',[$dateVariable,$now])->get();
+        $sql = Data::where('meter_id','=','18')->whereBetween('DateTime',[$dateVariable,$now])->get();
 
 //        echo $sql;
 
