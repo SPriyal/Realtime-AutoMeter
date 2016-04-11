@@ -23,6 +23,12 @@ Route::post('mapping/Selection','MappingController@mappingSelectionPage');
 Route::post('mapping/Selection/Submit','MappingController@mappingSubmit');
 //==================Mapping related routes FINISH [parameter & csvDataColumn mappings]==================
 
+
+Route::get('/taTest', 'SearchController@index');
+Route::get('/query', 'SearchController@query');
+
+
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
