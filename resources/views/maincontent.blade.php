@@ -4,6 +4,32 @@
 
         <div class="box box-default">
 			<div class="box-header with-border">
+				<h3 class="box-title">Search</h3>
+				<div class="box-tools pull-right">
+					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+				</div><!-- /.box-tools -->
+			</div><!-- /.box-header -->
+			<div class="box-body">
+				{{--<- Live data Here ->--}}
+				<!-- Small boxes (Stat box) -->
+				<div class="row">
+					<div class="col-lg-3 col-xs-6">
+					    <div id="remote">
+                        {!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}
+                        {!! Form::text('searchBox',null,array('placeholder' => 'Search Anything!','id'=>'searchInBox', 'class' => 'form-control typeahead')) !!}
+                        {!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}
+                        {!!Form::close()!!}
+
+
+                        {{--<input type="text" class="typeahead" placeholder="Search...">--}}
+                        </div>
+					</div><!-- ./col -->
+				</div><!-- /.row -->
+			</div><!-- /.box-body -->
+		</div><!-- /.box -->
+
+        <div class="box box-default">
+			<div class="box-header with-border">
 				<h3 class="box-title">Admin Panel</h3>
 				<div class="box-tools pull-right">
 					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
