@@ -76,6 +76,9 @@
           {{--Following are the Scripts necessary for graph--}}
           <script src="{{ asset ("/js/highstock.js") }}"></script>
           <script src="{{ asset ("/js/exporting.js") }}"></script>
+          <script src="{{ asset ("/js/TypeAhead/typeahead.bundle.js") }}"></script>
+          <script src="{{ asset ("/js/TypeAhead/taMain.js") }}"></script>
+
 
               <!-- DataTables -->
               <script src="{{ asset ("/bower_components/admin-lte/plugins/datatables/jquery.dataTables.min.js") }}"></script>
