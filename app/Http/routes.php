@@ -26,6 +26,8 @@ Route::post('mapping/Selection/Submit','MappingController@mappingSubmit');
 
 Route::get('/taTest', 'SearchController@index');
 Route::get('/query', 'SearchController@query');
+Route::get('/searchDescendant', 'SearchController@searchDescendant');
+Route::post('/searchResult', 'SearchController@searchResult');
 
 
 

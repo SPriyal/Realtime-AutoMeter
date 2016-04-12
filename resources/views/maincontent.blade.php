@@ -14,12 +14,14 @@
 				<!-- Small boxes (Stat box) -->
 				<div class="row">
 					<div class="col-lg-3 col-xs-6">
-                        {{--{!! Form::open(array('url'=>'adminPanel/Process','method'=>'POST', 'files'=>true)) !!}--}}
-                        {{--{!! Form::text('newCompanyName',null,array('placeholder' => 'Enter Company Name','id'=>'searchInBox', 'class' => 'form-control typeahead')) !!}--}}
-                        {{--{!! Form::submit('Submit', array('class'=>'btn btn-primary')) !!}--}}
-                        {{--{!!Form::close()!!}--}}
-                        <div id="remote">
-                        <input type="text" class="typeahead" placeholder="Search...">
+					    <div id="remote">
+                        {!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}
+                        {!! Form::text('searchBox',null,array('placeholder' => 'Search Anything!','id'=>'searchInBox', 'class' => 'form-control typeahead')) !!}
+                        {!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}
+                        {!!Form::close()!!}
+
+
+                        {{--<input type="text" class="typeahead" placeholder="Search...">--}}
                         </div>
 					</div><!-- ./col -->
 				</div><!-- /.row -->

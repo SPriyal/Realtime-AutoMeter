@@ -1,26 +1,27 @@
 jQuery(document).ready(function($) {
     var engine = new Bloodhound({
-        remote: {
-            url: '/query?user=%QUERY',
-            wildcard: '%QUERY'
-        },
+        //remote: {
+        //    url: '/query?user=%QUERY',
+        //    wildcard: '%QUERY'
+        //},
+        prefetch: 'searchDescendant',
         // '...' = displayKey: '...'
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('username'),
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace
     });
 
-    engine.initialize();
+    //engine.initialize();
 
     $('#remote .typeahead').typeahead({
-        hint: true,
+        hint: false,
         classNames: {
             input: 'form-control',
-            hint: 'Typeahead-hint',
+            menu: 'form-control',
             selectable: 'Typeahead-selectable'
         },
         highlight: true
     }, {
-        source: engine.ttAdapter(),
+        source: engine,
         // This will be appended to "tt-dataset-" to form the class name of the suggestion menu.
         name: 'User_list',
         // the key from the array we want to display (name,id,email,etc...)
@@ -32,16 +33,18 @@ jQuery(document).ready(function($) {
                 '</div>'
             ].join('\n'),
             suggestion: function(variable){
-                return '<div style="background: #FFFFFF; font-size: x-large;">'+variable.name+'</div>'
+                //var link = /l/public/e/"+variable.id;
+                return '<a href="/l/public/e/'+variable.id+'"><div style="background: #FFFFFF; font-size: x-large;">'+variable.name+'  '+variable.id+'</div></a>'
+                //TODO - Hardcoded link above (URL_ENTITY)!
             }
         }
 
 
     });
 
-
-
 });
+
+
 
 //templates: {
 //    empty: [
