@@ -9,6 +9,7 @@ use Validator;
 use Illuminate\Support\Facades\Session as Session;
 use DB;
 use App\testdata as testdata;
+use App\parameterDetails as Parameter;
 use App\Data as Data;
 
 class HomeController extends Controller
@@ -243,11 +244,25 @@ class HomeController extends Controller
 
         $now = date('Y-m-d H:i:s');
 
-        $sql = Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->whereBetween('DateTime',[$dateVariable,$now])->get();
+//        $parameterIdOfCurrentNode = Company::select('parameter_id')->where('meter_id',$nodeId);
+
+        $sql = Data::select('id','meter_id','parameter_id','value','DateTime')
+                    ->where('meter_id','=',$nodeId)->whereBetween('DateTime',[$dateVariable,$now])
+                    ->get();
+//        $sql = Data::with('paraDetails')->find(1)->paraDetails;
+//        $sql = Parameter::find(1)->dataDetails;
+
+        $parameterIdOfCurrentNode = $sql[0]['parameter_id'];
+        $parameterNameOfCurrentNode = Parameter::select('unit')->where('id','=',$parameterIdOfCurrentNode)->get();
+//        echo json_decode($parameterNameOfCurrentNode);
+        $finalResult = array_merge(json_decode($parameterNameOfCurrentNode),json_decode($sql));
+        $final = ['parameter'=>$parameterNameOfCurrentNode,'data'=>$sql];
+
 
 //        echo $sql;
-
-        return $sql;
+//        return $finalResult;
+//        return $sql;
+        return $final;
 
     }
     // ----------------------- GRAPH CODE Finish------------------------------------------------

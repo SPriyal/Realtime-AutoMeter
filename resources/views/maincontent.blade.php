@@ -71,7 +71,7 @@
 						<div class="small-box bg-aqua">
 							<div class="inner">
 								<h3>
-								    <b id="currentValue">---</b><sup style="font-size: 20px">units</sup>
+								    <b id="currentValue">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
 								    <p id="currentValueDate">(Date Time)</p>
                                 </h3>
 
@@ -88,7 +88,7 @@
 						<div class="small-box bg-green">
 							<div class="inner">
 								<h3>
-								    <b id="maximumValue">---</b><sup style="font-size: 20px">units</sup>
+								    <b id="maximumValue">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
 								    <p id="maximumValueDate">(Date Time)</p>
 								</h3>
 
@@ -104,7 +104,7 @@
 						<div class="small-box bg-yellow">
 							<div class="inner">
 								<h3>
-								    <b id="averageValue">---</b><sup style="font-size: 20px">units</sup>
+								    <b id="averageValue">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
                                     <p id="averageValueDate">(Start Time) to (Current Time)</p>
                                 </h3>
 								<p>Average</p>
@@ -119,7 +119,7 @@
 						<div class="small-box bg-red">
 							<div class="inner">
 								<h3>
-								    <b id="minimumValue">---</b><sup style="font-size: 20px">units</sup>
+								    <b id="minimumValue">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
 								    <p id="minimumValueDate">(Date Time)</p>
                                 </h3>
 								<p>Minimum</p>
@@ -209,13 +209,19 @@
 	<script type="text/javascript">
 		$(function () {
 			var datePreviouslyTaken,dateCheck=0,dateCurrentOne;
-			var feedback = <?php echo json_encode($dataForPreviousValues); ?>;
+			var twoDimensionalFeedback = <?php echo json_encode($dataForPreviousValues); ?>;
 			{{----}}
 //                    document.writeln(feedback);
+//			console.log("Feedback[0] is - "+feedback['a'][0].unit);
+            var feedback = twoDimensionalFeedback['data'];
+            var parameterOfCurrentMeter = twoDimensionalFeedback['parameter'][0].unit;
+//            console.log("parameeter is "+parameterOfCurrentMeter)
 			var feedbackLength = feedback.length;
 			datePreviouslyTaken = Date.createFromMysql(feedback[feedbackLength - 1].DateTime);
+//			console.log("Date - "+datePreviouslyTaken);
 			var arrayOfValuesOfCurrentMeter = new Array();
-			for($i=0;$i<feedbackLength;$i++){
+
+			for($i=1;$i<feedbackLength;$i++){
 			    arrayOfValuesOfCurrentMeter.push(feedback[$i].value);
 			}
 			var maximumIndexFromPrevious = indexOfMax(arrayOfValuesOfCurrentMeter);
@@ -235,6 +241,10 @@
 //                document.getElementById("titleToGraph").innerHTML = ""+Date.createFromMysql(feedback[0].DateTime).toUTCString()+"&nbsp;&nbsp; to &nbsp;&nbsp;"+Date.createFromMysql(feedback[feedback.length-1].DateTime).toUTCString();
 //                document.getElementById("averageValueDate").innerHTML = "("+feedback[0].DateTime+" to <br/>"+feedback[feedbackLength-1].DateTime+")";
                 document.getElementById("titleToGraph").innerHTML = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
+                var allTilesParaUnits = document.getElementsByClassName("parameterUnit");
+                for($k=0;$k<allTilesParaUnits.length;$k++){
+                    allTilesParaUnits[$k].innerHTML = parameterOfCurrentMeter;
+                }
             }
 
 
@@ -407,7 +417,7 @@
 				},
 
 				series : [{
-					name : 'Test',
+					name : 'Value',
 					data : (function () {
 						// generate graph for previousData
 

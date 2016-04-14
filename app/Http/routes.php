@@ -30,7 +30,7 @@ Route::get('/searchDescendant', 'SearchController@searchDescendant');
 Route::post('/searchResult', 'SearchController@searchResult');
 //==========================Search related routes FINISH [TypeAhead]===========================
 
-Route::get('/pV','HomeController@PreviousValues');
+Route::get('/pV/{id}',['uses'=>'HomeController@PreviousValues']);
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
