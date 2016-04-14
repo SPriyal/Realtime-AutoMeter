@@ -139,7 +139,7 @@
 		<div class="col-md-12">
 			<div class="box">
 				<div class="box-header with-border">
-					<h3 class="box-title">Monthly Recap Report</h3>
+					<h3 class="box-title">Graphical Report</h3>
 					<div class="box-tools pull-right">
                         <div class="btn-group">
                             <button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>
@@ -166,7 +166,7 @@
 				</div><!-- /.box-header -->
 				<div class="box-body">
 							<p class="text-center">
-								<strong>Sales: 1 Jan, 2014 - 30 Jul, 2014</strong>
+								<strong id="titleToGraph"></strong>
 							</p>
 							<div id="chartContainer" style="height: 300px; min-width: 200px">
 							</div><!-- /.chart-responsive -->
@@ -225,14 +225,16 @@
             window.onload = settingElements();
             function settingElements() {
                 document.getElementById("currentValue").innerHTML = parseInt(feedback[feedbackLength-1].value);
-                document.getElementById("currentValueDate").innerHTML = "(" +feedback[feedbackLength-1].DateTime+")";
+                document.getElementById("currentValueDate").innerHTML = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                 document.getElementById("maximumValue").innerHTML = parseInt(feedback[maximumIndexFromPrevious].value);
-                document.getElementById("maximumValueDate").innerHTML = "("+feedback[maximumIndexFromPrevious].DateTime+")";
+                document.getElementById("maximumValueDate").innerHTML = "("+moment(feedback[maximumIndexFromPrevious].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                 document.getElementById("minimumValue").innerHTML = parseInt(feedback[minimumIndexFromPrevious].value);
-                document.getElementById("minimumValueDate").innerHTML = "("+feedback[minimumIndexFromPrevious].DateTime+")";
+                document.getElementById("minimumValueDate").innerHTML = "("+moment(feedback[minimumIndexFromPrevious].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                 document.getElementById("averageValue").innerHTML = averageOfArray(arrayOfValuesOfCurrentMeter);
-                document.getElementById("startTimeEndTime").innerHTML = "*<b><u>Start Time</u> - </b>"+feedback[0].DateTime+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+feedback[feedback.length-1].DateTime;
+                document.getElementById("startTimeEndTime").innerHTML = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
+//                document.getElementById("titleToGraph").innerHTML = ""+Date.createFromMysql(feedback[0].DateTime).toUTCString()+"&nbsp;&nbsp; to &nbsp;&nbsp;"+Date.createFromMysql(feedback[feedback.length-1].DateTime).toUTCString();
 //                document.getElementById("averageValueDate").innerHTML = "("+feedback[0].DateTime+" to <br/>"+feedback[feedbackLength-1].DateTime+")";
+                document.getElementById("titleToGraph").innerHTML = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
             }
 
 
