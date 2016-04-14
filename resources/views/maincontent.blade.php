@@ -404,12 +404,12 @@
 						type: 'sll',
 						text: 'ALL'
 					}],
-					inputEnabled: false,
+					inputEnabled: true,
 					selected: 1
 				},
-                rangeSelector: {
-                    selected: 1
-                },
+//                rangeSelector: {
+//                    selected: 1
+//                },
 				title : {
 					text : ''
 				},

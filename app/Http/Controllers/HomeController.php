@@ -281,7 +281,7 @@ class HomeController extends Controller
     {
         $dataForTable = $this->TableValue($nodeId);
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              TODO - Implement PreviousValues for different meters whenever clicked!
+        $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              
 //        echo $dataForPreviousValues;
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }
