@@ -29,7 +29,10 @@ class SearchController extends Controller {
     }
 
     public function searchDescendant(){
-        $companyHierarchyCollection = Company::where('id', '=', '16')           //TODO - Add assoc id!
+        $user = \Auth::user();
+        $currentUserId = $user->asso_id;
+
+        $companyHierarchyCollection = Company::where('id', '=', $currentUserId)
                                             ->first()->getDescendants();
         $arrayOfCompanyDescendants = array();
         foreach($companyHierarchyCollection as $descendant){
