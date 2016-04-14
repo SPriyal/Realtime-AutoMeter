@@ -274,10 +274,12 @@
 							var series = this.series[0];
 							setInterval(function () {
 								var feedbackLive ;
+								var idOfCurrentMeter = feedback[0].meter_id;
 								feedbackLive = $.ajax({
 									type: "POST",
 									cache: false,
-									url: "/liveGraphValues",
+									url: "/liveGraphValues/"+idOfCurrentMeter,
+//									data: idOfCurrentMeter,
 									async: false
 								}).success(function(){
 									setTimeout(function(){get_fb_success();}, 500);

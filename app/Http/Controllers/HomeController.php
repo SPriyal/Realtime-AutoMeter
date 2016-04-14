@@ -208,9 +208,10 @@ class HomeController extends Controller
         return $previousValueData;
         //return view('graphs.index',compact('dataForPreviousValues'));
     }
-    public function LiveValues()
+    public function LiveValues($nodeId)
     {
-        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=','18')->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
+//        echo "id from client is ".$nodeId;
+        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
         return json_encode($query);
     }
     public function shiftCheck()
