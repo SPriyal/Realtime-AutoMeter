@@ -407,13 +407,28 @@
 					inputEnabled: false,
 					selected: 1
 				},
-
+                rangeSelector: {
+                    selected: 1
+                },
 				title : {
 					text : ''
 				},
 
+                navigation: {
+                    buttonOptions: {
+
+                    },
+                    menuItemStyle: {
+                        fontSize: '15px'
+                    }
+                },
+
+                tooltip: {
+                    valueSuffix: parameterOfCurrentMeter
+                },
 				exporting: {
-					enabled: false
+					enabled: true
+
 				},
 
 				series : [{
