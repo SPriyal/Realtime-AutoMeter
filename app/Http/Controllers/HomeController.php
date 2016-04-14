@@ -42,8 +42,8 @@ class HomeController extends Controller
     public function index()
     {
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(); //for live graph
-        $dataForTable = $this->TableValue(4); //for Table
+        $dataForPreviousValues = $this->PreviousValues(18); //for live graph
+        $dataForTable = $this->TableValue(18); //for Table
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }
 
@@ -182,7 +182,7 @@ class HomeController extends Controller
 
 
     // -----------------------GRAPH REQUIRED CODE BELOW ----------------------------------------
-    public function PreviousValues()
+    public function PreviousValues($nodeId)
     {
         date_default_timezone_set('Asia/Kolkata');
 
@@ -193,16 +193,16 @@ class HomeController extends Controller
             $morningShiftTime = strtotime(date("Y-m-d") . "09:00:00");
             $tenMinutesAfterMorningShiftTime = strtotime(date("Y-m-d") . "09:10:00");
             if ($nowTime >= $morningShiftTime && $nowTime <= $tenMinutesAfterMorningShiftTime)
-                $previousValueData = $this->fetchData("08:45:00");
+                $previousValueData = $this->fetchData("08:45:00",$nodeId);
             else
-                $previousValueData = $this->fetchData("09:00:00");
+                $previousValueData = $this->fetchData("09:00:00",$nodeId);
         } else if ($shiftCheckResult == "night" || $shiftCheckResult == "midnight") {
             $nightShiftTime = strtotime(date("Y-m-d") . "21:00:00");
             $tenMinutesAfterNightShiftTime = strtotime(date("Y-m-d") . "21:10:00");
             if ($nowTime >= $nightShiftTime && $nowTime <= $tenMinutesAfterNightShiftTime)
-                $previousValueData = $this->fetchData("20:45:00");
+                $previousValueData = $this->fetchData("20:45:00",$nodeId);
             else
-                $previousValueData = $this->fetchData("21:00:00");
+                $previousValueData = $this->fetchData("21:00:00",$nodeId);
         }
 
         return $previousValueData;
@@ -232,7 +232,7 @@ class HomeController extends Controller
     /**
      * @param $RequiredStartTimeOfShift
      */
-    public function fetchData($RequiredStartTimeOfShift)
+    public function fetchData($RequiredStartTimeOfShift,$nodeId)
     {
 
         if ($GLOBALS['$shiftCheckResult'] == "midnight")
@@ -242,7 +242,7 @@ class HomeController extends Controller
 
         $now = date('Y-m-d H:i:s');
 
-        $sql = Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=','18')->whereBetween('DateTime',[$dateVariable,$now])->get();
+        $sql = Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->whereBetween('DateTime',[$dateVariable,$now])->get();
 
 //        echo $sql;
 
@@ -265,7 +265,7 @@ class HomeController extends Controller
     {
         $dataForTable = $this->TableValue($nodeId);
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(); //for live graph              TODO - Implement PreviousValues for different meters whenever clicked!
+        $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              TODO - Implement PreviousValues for different meters whenever clicked!
 //        echo $dataForPreviousValues;
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }
