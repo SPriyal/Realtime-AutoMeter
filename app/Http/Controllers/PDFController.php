@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Session as Session;
 use DB;
 use App\parameterDetails;
 use App\Data as Data;
+use Carbon\Carbon;
 
 
 include(app_path() . '/Libraries/tcpdf/tcpdf.php');
@@ -97,30 +98,44 @@ class PDFController extends Controller
         $TestStartCall = $this->TimeCheck($value);
         $TestEnd = date("Y-m-d h:i:s");
 
-        $txt = <<<EOD
-
-
-Report Start Time and Date: $TestStartCall
-Report  End  Time and Date: $TestEnd
-
-
-
-EOD;
-
-// print a block of text using Write()
-        $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
-
-
         for ($a = 0; $a < sizeof($SiblingsID); $a++) {
 
             $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
-            $result = Data::select('parameter_id', 'value', 'DateTime')->where('meter_id', $SiblingsID[$a])->where('DateTime', '>', $TestStartCall)->where('DateTime','<',$TestEnd)->get();
+            $result = Data::select('parameter_id', 'value', 'DateTime')
+                ->where('meter_id', $SiblingsID[$a])
+                ->where('DateTime', '>', $TestStartCall)
+                ->where('DateTime', '<', $TestEnd)
+                ->get();
+//                ->groupBy(function ($date) {
+//                    echo Carbon::parse($date->created_at)->format('h '); // grouping by hours
+//
+//                });
+//            echo $result;
             $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
             $result2 = parameterDetails::select('unit')->where('id', $result[0]['parameter_id'])->get();
-            $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
 
 // print a block of text using Write()
+            $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
             $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+            $html = '<h2 align="center"><b> </b></h2>';
+            $pdf->writeHTML($html, true, false, true, false, '');
+
+
+
+
+
+            $visitorTraffic = Data::select('parameter_id', 'value', 'DateTime')->where('meter_id', $SiblingsID[$a])
+                ->get()
+                ->groupBy(function ($date) {
+                    return Carbon::parse($date->created_at)->format('h'); // grouping by hours
+                    //return Carbon::parse($date->created_at)->format('m'); // grouping by months
+                });
+            //echo $visitorTraffic;
+
+
+
+
+
 
             $pdf->SetFont('Times', '', 12);
             foreach ($header as $heading) {
@@ -141,10 +156,23 @@ EOD;
             $pdf->AddPage();
         }
 
+        $txt = <<<EOD
+============Report Summary============
+
+
+
+Report Start Time and Date: $TestStartCall
+Report  End  Time and Date: $TestEnd
+
+EOD;
+
+// print a block of text using Write()
+        $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+
         $pdf->Output();
 
     }
-    
+
     public function TimeCheck($nodeId)
     {
         date_default_timezone_set('Asia/Kolkata');
