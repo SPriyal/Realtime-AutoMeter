@@ -78,6 +78,7 @@
           <script src="{{ asset ("/js/exporting.js") }}"></script>
           <script src="{{ asset ("/js/TypeAhead/typeahead.bundle.js") }}"></script>
           <script src="{{ asset ("/js/TypeAhead/taMain.js") }}"></script>
+          <script src="{{ asset ("/js/momentJS/moment.js") }}"></script>
 
 
               <!-- DataTables -->

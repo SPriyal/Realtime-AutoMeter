@@ -9,6 +9,7 @@ use Validator;
 use Illuminate\Support\Facades\Session as Session;
 use DB;
 use App\testdata as testdata;
+use App\parameterDetails as Parameter;
 use App\Data as Data;
 
 class HomeController extends Controller
@@ -42,8 +43,8 @@ class HomeController extends Controller
     public function index()
     {
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(); //for live graph
-        $dataForTable = $this->TableValue(4); //for Table
+        $dataForPreviousValues = $this->PreviousValues(18); //for live graph
+        $dataForTable = $this->TableValue(18); //for Table
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }
 
@@ -182,7 +183,7 @@ class HomeController extends Controller
 
 
     // -----------------------GRAPH REQUIRED CODE BELOW ----------------------------------------
-    public function PreviousValues()
+    public function PreviousValues($nodeId)
     {
         date_default_timezone_set('Asia/Kolkata');
 
@@ -193,24 +194,25 @@ class HomeController extends Controller
             $morningShiftTime = strtotime(date("Y-m-d") . "09:00:00");
             $tenMinutesAfterMorningShiftTime = strtotime(date("Y-m-d") . "09:10:00");
             if ($nowTime >= $morningShiftTime && $nowTime <= $tenMinutesAfterMorningShiftTime)
-                $previousValueData = $this->fetchData("08:45:00");
+                $previousValueData = $this->fetchData("08:45:00",$nodeId);
             else
-                $previousValueData = $this->fetchData("09:00:00");
+                $previousValueData = $this->fetchData("09:00:00",$nodeId);
         } else if ($shiftCheckResult == "night" || $shiftCheckResult == "midnight") {
             $nightShiftTime = strtotime(date("Y-m-d") . "21:00:00");
             $tenMinutesAfterNightShiftTime = strtotime(date("Y-m-d") . "21:10:00");
             if ($nowTime >= $nightShiftTime && $nowTime <= $tenMinutesAfterNightShiftTime)
-                $previousValueData = $this->fetchData("20:45:00");
+                $previousValueData = $this->fetchData("20:45:00",$nodeId);
             else
-                $previousValueData = $this->fetchData("21:00:00");
+                $previousValueData = $this->fetchData("21:00:00",$nodeId);
         }
 
         return $previousValueData;
         //return view('graphs.index',compact('dataForPreviousValues'));
     }
-    public function LiveValues()
+    public function LiveValues($nodeId)
     {
-        $query =  Data::where('meter_id','=','18')->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
+//        echo "id from client is ".$nodeId;
+        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
         return json_encode($query);
     }
     public function shiftCheck()
@@ -232,7 +234,7 @@ class HomeController extends Controller
     /**
      * @param $RequiredStartTimeOfShift
      */
-    public function fetchData($RequiredStartTimeOfShift)
+    public function fetchData($RequiredStartTimeOfShift,$nodeId)
     {
 
         if ($GLOBALS['$shiftCheckResult'] == "midnight")
@@ -242,11 +244,25 @@ class HomeController extends Controller
 
         $now = date('Y-m-d H:i:s');
 
-        $sql = Data::where('meter_id','=','18')->whereBetween('DateTime',[$dateVariable,$now])->get();
+        $parameterIdOfCurrentNode = Company::select('parameter_id')->where('id','=',$nodeId)->get();
+
+        $sql = Data::select('id','meter_id','parameter_id','value','DateTime')
+                    ->where('meter_id','=',$nodeId)->whereBetween('DateTime',[$dateVariable,$now])
+                    ->get();
+//        $sql = Data::with('paraDetails')->find(1)->paraDetails;
+//        $sql = Parameter::find(1)->dataDetails;
+//            echo "para id - ".$parameterIdOfCurrentNode;
+//        $parameterIdOfCurrentNode = $sql[0]['parameter_id'];
+        $parameterNameOfCurrentNode = Parameter::select('unit')->where('id','=',$parameterIdOfCurrentNode[0]['parameter_id'])->get();
+//        echo json_decode($parameterNameOfCurrentNode);
+//        $finalResult = array_merge(json_decode($parameterNameOfCurrentNode),json_decode($sql));
+        $final = ['parameter'=>$parameterNameOfCurrentNode,'data'=>$sql];
+
 
 //        echo $sql;
-
-        return $sql;
+//        return $finalResult;
+//        return $sql;
+        return $final;
 
     }
     // ----------------------- GRAPH CODE Finish------------------------------------------------
@@ -265,7 +281,7 @@ class HomeController extends Controller
     {
         $dataForTable = $this->TableValue($nodeId);
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(); //for live graph
+        $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              
 //        echo $dataForPreviousValues;
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }

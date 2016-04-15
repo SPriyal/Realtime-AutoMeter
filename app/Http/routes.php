@@ -23,13 +23,14 @@ Route::post('mapping/Selection','MappingController@mappingSelectionPage');
 Route::post('mapping/Selection/Submit','MappingController@mappingSubmit');
 //==================Mapping related routes FINISH [parameter & csvDataColumn mappings]==================
 
-
+//==========================Search related routes BELOW [TypeAhead]===========================
 Route::get('/taTest', 'SearchController@index');
 Route::get('/query', 'SearchController@query');
 Route::get('/searchDescendant', 'SearchController@searchDescendant');
 Route::post('/searchResult', 'SearchController@searchResult');
+//==========================Search related routes FINISH [TypeAhead]===========================
 
-
+Route::get('/pV/{id}',['uses'=>'HomeController@PreviousValues']);
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
@@ -39,7 +40,9 @@ Route::controllers([
 Route::get('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@getLogin'));
 Route::post('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@postLogin'));
 Route::get('/logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@getLogout'));
-Route::post('liveGraphValues', 'HomeController@LiveValues');
+
+
+Route::post('liveGraphValues/{nodeId}',['uses' => 'HomeController@LiveValues']);
 //Show live graph if a meter name is clicked
 Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@TableFromHierarchy']);
 //Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c){$data['c'] = $c;return View::make('maincontent', $data);});
