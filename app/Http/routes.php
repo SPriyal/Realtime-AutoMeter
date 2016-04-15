@@ -47,7 +47,6 @@ Route::controllers([
 Route::get('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@getLogin'));
 Route::post('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@postLogin'));
 Route::get('/logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@getLogout'));
-<<<<<<< HEAD
 
 Route::post('liveGraphValues/{nodeId}',['uses' => 'HomeController@LiveValues']);
 
