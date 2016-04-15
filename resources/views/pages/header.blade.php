@@ -25,7 +25,7 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-file-text"></i><span class="hidden-xs"> Reports</span> <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Today</a></li>
+            <li><a href="/pdf">Today</a></li>
             <li><a href="#">Yesterday </a></li>
             <li class="divider"></li>
             <li><a href="#">Custom date</a></li>

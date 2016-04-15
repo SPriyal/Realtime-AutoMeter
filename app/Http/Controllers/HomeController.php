@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Company;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Input;
@@ -9,6 +10,7 @@ use Validator;
 use Illuminate\Support\Facades\Session as Session;
 use DB;
 use App\testdata as testdata;
+use App\parameterDetails as Parameter;
 use App\Data as Data;
 
 class HomeController extends Controller
@@ -41,10 +43,24 @@ class HomeController extends Controller
      */
     public function index()
     {
+
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(); //for live graph
-        $dataForTable = $this->TableValue(4); //for Table
+        $dataForPreviousValues = $this->PreviousValues(18); //for live graph
+        $dataForTable = $this->TableValue(18); //for Table
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
+
+        $user = \Auth::user();
+        $associated_id = $user->asso_id;
+        if($associated_id == 0){
+            $html = '';//$this->getHTMLforAdmin();
+            return view('adminPanel.adminDashboard', compact('html'));
+        }
+        else {
+            $html = $this->getHtmlForHierarchy(); //for left navigation
+            $dataForPreviousValues = $this->PreviousValues(); //for live graph
+            $dataForTable = $this->TableValue(4); //for Table
+            return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+        }
     }
 
 
@@ -127,6 +143,18 @@ class HomeController extends Controller
 //    =============================New Company Insertion from CSV Parser Code FINISH==================================
 
 
+//    =============================New USER Insertion from form BELOW==================================
+public function AdminPanelNewUser(Request $request){
+    $name = $request->get('inputName3');
+    $email = $request->get('inputEmail3');
+    $password = bcrypt($request->get('inputPassword3'));
+    $asso_id = $request->get('inputAsso3');
+
+    $root = User::create(['name' => $name, 'email' => $email, 'password' => $password, 'asso_id' => $asso_id]);   //Creating node
+}
+//    =============================New USER Insertion from form Finish==================================
+
+
     // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ----------------------------
     /**
      * Recursive function that returns tree for a given node.
@@ -152,7 +180,7 @@ class HomeController extends Controller
             $html = $html . "<li>"
                           . "<a href='/"
                           .env('URL_ENTITY', 'auto')
-                          ."/{$node->id}'><span>{$node->name}</span></a>";
+                          ."/{$node->id}'><i class='fa fa-circle'></i><span>{$node->name}</span></a>";
         }
 
         $html = $html . "</li>";
@@ -166,8 +194,10 @@ class HomeController extends Controller
      */
     public function getHtmlForHierarchy() {
 
+        $user = \Auth::user();
+        $associated_id = $user->asso_id;
         //get the descendants of the given company for sidebar hierarchy into a collection
-        $companyHierarchyCollection = Company::where('name', '=', 'N2P2 Pvt. Ltd.')
+        $companyHierarchyCollection = Company::where('id', '=', $associated_id)
                                         ->first()->getDescendants()->toHierarchy();
 
         global $html;
@@ -179,10 +209,8 @@ class HomeController extends Controller
     }
     // -----------------------LEFT NAVIGATION HIERARCHY CODE Finish ----------------------------
 
-
-
     // -----------------------GRAPH REQUIRED CODE BELOW ----------------------------------------
-    public function PreviousValues()
+    public function PreviousValues($nodeId)
     {
         date_default_timezone_set('Asia/Kolkata');
 
@@ -193,24 +221,25 @@ class HomeController extends Controller
             $morningShiftTime = strtotime(date("Y-m-d") . "09:00:00");
             $tenMinutesAfterMorningShiftTime = strtotime(date("Y-m-d") . "09:10:00");
             if ($nowTime >= $morningShiftTime && $nowTime <= $tenMinutesAfterMorningShiftTime)
-                $previousValueData = $this->fetchData("08:45:00");
+                $previousValueData = $this->fetchData("08:45:00",$nodeId);
             else
-                $previousValueData = $this->fetchData("09:00:00");
+                $previousValueData = $this->fetchData("09:00:00",$nodeId);
         } else if ($shiftCheckResult == "night" || $shiftCheckResult == "midnight") {
             $nightShiftTime = strtotime(date("Y-m-d") . "21:00:00");
             $tenMinutesAfterNightShiftTime = strtotime(date("Y-m-d") . "21:10:00");
             if ($nowTime >= $nightShiftTime && $nowTime <= $tenMinutesAfterNightShiftTime)
-                $previousValueData = $this->fetchData("20:45:00");
+                $previousValueData = $this->fetchData("20:45:00",$nodeId);
             else
-                $previousValueData = $this->fetchData("21:00:00");
+                $previousValueData = $this->fetchData("21:00:00",$nodeId);
         }
 
         return $previousValueData;
         //return view('graphs.index',compact('dataForPreviousValues'));
     }
-    public function LiveValues()
+    public function LiveValues($nodeId)
     {
-        $query =  testdata::where('dateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('dateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
+//        echo "id from client is ".$nodeId;
+        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
         return json_encode($query);
     }
     public function shiftCheck()
@@ -232,7 +261,7 @@ class HomeController extends Controller
     /**
      * @param $RequiredStartTimeOfShift
      */
-    public function fetchData($RequiredStartTimeOfShift)
+    public function fetchData($RequiredStartTimeOfShift,$nodeId)
     {
 
         if ($GLOBALS['$shiftCheckResult'] == "midnight")
@@ -242,28 +271,55 @@ class HomeController extends Controller
 
         $now = date('Y-m-d H:i:s');
 
-        $sql = testdata::whereBetween('dateTime',[$dateVariable,$now])->get();
+        $parameterIdOfCurrentNode = Company::select('parameter_id')->where('id','=',$nodeId)->get();
 
-        return $sql;
+        $sql = Data::select('id','meter_id','parameter_id','value','DateTime')
+                    ->where('meter_id','=',$nodeId)->whereBetween('DateTime',[$dateVariable,$now])
+                    ->get();
+//        $sql = Data::with('paraDetails')->find(1)->paraDetails;
+//        $sql = Parameter::find(1)->dataDetails;
+//            echo "para id - ".$parameterIdOfCurrentNode;
+//        $parameterIdOfCurrentNode = $sql[0]['parameter_id'];
+        $parameterNameOfCurrentNode = Parameter::select('unit')->where('id','=',$parameterIdOfCurrentNode[0]['parameter_id'])->get();
+//        echo json_decode($parameterNameOfCurrentNode);
+//        $finalResult = array_merge(json_decode($parameterNameOfCurrentNode),json_decode($sql));
+        $final = ['parameter'=>$parameterNameOfCurrentNode,'data'=>$sql];
+
+
+//        echo $sql;
+//        return $finalResult;
+//        return $sql;
+        return $final;
 
     }
     // ----------------------- GRAPH CODE Finish------------------------------------------------
 
-
-
     public function testing()
     {
-        return view('pages.mapping');
+        return "inside testing function in home controller";
+//        return view('pages.mapping');
+        // $parent = Company::where('id','12')->first()->getRoot();
+//        var_dump($parent);
+//        var_dump($parent['name']);
+        //echo $parent['name'];
+
+//        $ancestor = Company::where('id','3')->parent()->get();
+//        //var_dump($ancestor['name']);
+//        echo $ancestor['name'];
+
+
+//        $parent = Company::where('id','3')->parent()->get();
+//        echo $parent;
+
     }
-
-
 
 //    =========================Table Generation Code BELOW======================================
     public function TableFromHierarchy($nodeId)
     {
         $dataForTable = $this->TableValue($nodeId);
+        Session::set('nodeID', $nodeId);
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(); //for live graph
+        $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              
 //        echo $dataForPreviousValues;
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
     }

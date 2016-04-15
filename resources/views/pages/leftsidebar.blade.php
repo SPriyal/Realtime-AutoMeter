@@ -17,18 +17,24 @@
     </div>
 
     <!-- search form -->
+
     <form action="#" method="get" class="sidebar-form">
-      <div class="input-group">
-        <input type="text" name="q" class="form-control" placeholder="Search..."/>
+      <div class="input-group" >
+        <div id="searchCompany">
+            <input type="text" name="q"  class="form-control abcSearch" placeholder="Search..."/>
+        </div>
         <span class="input-group-btn">
           <button type='submit' name='search' id='search-btn' class="btn btn-flat"><i class="fa fa-search"></i></button>
         </span>
       </div>
     </form>
+    {{--<div id="remote">--}}
+        {{--<input type="text" class="typeahead" placeholder="Search...">--}}
+     {{--</div>--}}
     <!-- /.search form -->
 
     <!-- Sidebar Menu hierarchy-->
-    <ul class="sidebar-menu"> {!! $html !!} </ul>
+    <div><ul class="sidebar-menu"> {!! $html !!} </ul></div>
     <!-- /.sidebar-menu hierarchy-->
 
   </section>

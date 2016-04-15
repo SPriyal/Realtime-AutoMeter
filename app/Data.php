@@ -11,4 +11,8 @@ class Data extends Model {
      */
     protected $table = 'data';
 
+//    public function paraDetails(){
+//        return $this->hasOne('App\parameterDetails','id');
+//    }
+
 }

@@ -16,12 +16,28 @@ Route::get('home', 'HomeController@index');
 Route::get('/' , 'Auth\AuthController@getLogin' ) ;
 
 Route::post('adminPanel/Process','HomeController@processAdminPanelNewCompany');
+Route::post('adminPanel/adduser','HomeController@AdminPanelNewUser');
 
 //==================Mapping related routes BELOW [parameter & csvDataColumn mappings]==================
-Route::get('mapping','MappingController@mappingIndexPage');
-Route::post('mapping/Selection','MappingController@mappingSelectionPage');
-Route::post('mapping/Selection/Submit','MappingController@mappingSubmit');
+Route::get('metermapping','MappingController@mappingIndexPage');
+Route::post('metermapping/Selection','MappingController@mappingSelectionPage');
+Route::post('metermapping/Selection/Submit','MappingController@mappingSubmit');
+
+
+
+Route::get('/adduser',function(){
+    return view('adminPanel.addUser');
+});
 //==================Mapping related routes FINISH [parameter & csvDataColumn mappings]==================
+
+//==========================Search related routes BELOW [TypeAhead]===========================
+Route::get('/taTest', 'SearchController@index');
+Route::get('/query', 'SearchController@query');
+Route::get('/searchDescendant', 'SearchController@searchDescendant');
+Route::post('/searchResult', 'SearchController@searchResult');
+//==========================Search related routes FINISH [TypeAhead]===========================
+
+Route::get('/pV/{id}',['uses'=>'HomeController@PreviousValues']);
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
@@ -31,15 +47,34 @@ Route::controllers([
 Route::get('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@getLogin'));
 Route::post('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@postLogin'));
 Route::get('/logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@getLogout'));
+<<<<<<< HEAD
+
+Route::post('liveGraphValues/{nodeId}',['uses' => 'HomeController@LiveValues']);
+
+Route::get('/addcompany',function(){
+    return view('adminPanel.addCompany');
+});
+
 Route::post('/liveGraphValues', 'HomeController@LiveValues');
 //Show live graph if a meter name is clicked
 Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@TableFromHierarchy']);
+
+Route::get('/'.env('URL_ENTITY', 'auto').'/{c}/pdf', ['uses' =>'PDFController@PDFGen']);
+
 //Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c){$data['c'] = $c;return View::make('maincontent', $data);});
 //Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c) {
 //	echo "Entity id chosen is : ".$c;
 //});
 
-//<<<<<<<<<<<<<<--------------FOR TESTING PURPOSES ONLY-------------->>>>>>>>>>>>>>//
+//<<<<<<<<<<<<<<--------------FOR TESTING PURPOSES ONLY-------------->>>>>>>>>>>>//
+
+Route::get('pdf', 'PDFController@PDFGen');
+
+Route::get('check', 'HomeController@showProfile');
+
+Route::get('test', 'HomeController@testing');
+
+
 // make a sample hierarchy in thr database
 Route::get('/makehierarchy',function(){
 
@@ -105,3 +140,5 @@ Route::get('/graph',function() {
 	return view('lol', compact('outp'));
 
 });
+
+Route::get('random','HomeController@testing');
