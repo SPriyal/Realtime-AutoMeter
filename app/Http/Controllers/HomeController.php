@@ -297,12 +297,27 @@ public function AdminPanelNewUser(Request $request){
     public function testing()
     {
         return "inside testing function in home controller";
+//        return view('pages.mapping');
+        // $parent = Company::where('id','12')->first()->getRoot();
+//        var_dump($parent);
+//        var_dump($parent['name']);
+        //echo $parent['name'];
+
+//        $ancestor = Company::where('id','3')->parent()->get();
+//        //var_dump($ancestor['name']);
+//        echo $ancestor['name'];
+
+
+//        $parent = Company::where('id','3')->parent()->get();
+//        echo $parent;
+
     }
 
 //    =========================Table Generation Code BELOW======================================
     public function TableFromHierarchy($nodeId)
     {
         $dataForTable = $this->TableValue($nodeId);
+        Session::set('nodeID', $nodeId);
         $html = $this->getHtmlForHierarchy(); //for left navigation
         $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              
 //        echo $dataForPreviousValues;
