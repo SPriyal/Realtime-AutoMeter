@@ -255,7 +255,21 @@ class HomeController extends Controller
 
     public function testing()
     {
-        return view('pages.mapping');
+//        return view('pages.mapping');
+        // $parent = Company::where('id','12')->first()->getRoot();
+//        var_dump($parent);
+//        var_dump($parent['name']);
+        //echo $parent['name'];
+
+//        $ancestor = Company::where('id','3')->parent()->get();
+//        //var_dump($ancestor['name']);
+//        echo $ancestor['name'];
+
+
+//        $parent = Company::where('id','3')->parent()->get();
+//        echo $parent;
+
+
     }
 
 
@@ -264,6 +278,7 @@ class HomeController extends Controller
     public function TableFromHierarchy($nodeId)
     {
         $dataForTable = $this->TableValue($nodeId);
+        Session::set('nodeID', $nodeId);
         $html = $this->getHtmlForHierarchy(); //for left navigation
         $dataForPreviousValues = $this->PreviousValues(); //for live graph
 //        echo $dataForPreviousValues;
