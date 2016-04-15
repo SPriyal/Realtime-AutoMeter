@@ -271,18 +271,18 @@ public function AdminPanelNewUser(Request $request){
 
         $now = date('Y-m-d H:i:s');
 
-//        $parameterIdOfCurrentNode = Company::select('parameter_id')->where('meter_id',$nodeId);
+        $parameterIdOfCurrentNode = Company::select('parameter_id')->where('id','=',$nodeId)->get();
 
         $sql = Data::select('id','meter_id','parameter_id','value','DateTime')
                     ->where('meter_id','=',$nodeId)->whereBetween('DateTime',[$dateVariable,$now])
                     ->get();
 //        $sql = Data::with('paraDetails')->find(1)->paraDetails;
 //        $sql = Parameter::find(1)->dataDetails;
-
-        $parameterIdOfCurrentNode = $sql[0]['parameter_id'];
-        $parameterNameOfCurrentNode = Parameter::select('unit')->where('id','=',$parameterIdOfCurrentNode)->get();
+//            echo "para id - ".$parameterIdOfCurrentNode;
+//        $parameterIdOfCurrentNode = $sql[0]['parameter_id'];
+        $parameterNameOfCurrentNode = Parameter::select('unit')->where('id','=',$parameterIdOfCurrentNode[0]['parameter_id'])->get();
 //        echo json_decode($parameterNameOfCurrentNode);
-        $finalResult = array_merge(json_decode($parameterNameOfCurrentNode),json_decode($sql));
+//        $finalResult = array_merge(json_decode($parameterNameOfCurrentNode),json_decode($sql));
         $final = ['parameter'=>$parameterNameOfCurrentNode,'data'=>$sql];
 
 
