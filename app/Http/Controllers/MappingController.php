@@ -15,7 +15,7 @@ class MappingController extends Controller {
         foreach($companyListFromDB as $company){
             array_push($companyList,$company["name"]);
         }
-        return view('pages.mapping.mappingIndex',compact('companyList'));
+        return view('adminPanel.mappingIndex',compact('companyList'));
     }
 
     public function mappingSelectionPage(Request $request){
@@ -38,7 +38,7 @@ class MappingController extends Controller {
         }
 
 //        print_r($meterListForSelectedCompany);
-        return view('pages.mapping.mappingSelectionPage',compact('meterNameListForSelectedCompany','selectedCompany','meterIdListForSelectedCompany','parameterNameList','parameterIdList'));
+        return view('adminPanel.mappingSelectionPage',compact('meterNameListForSelectedCompany','selectedCompany','meterIdListForSelectedCompany','parameterNameList','parameterIdList'));
     }
 
     public function mappingSubmit(Request $request){

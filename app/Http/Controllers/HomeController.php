@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Company;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Input;
@@ -42,10 +43,24 @@ class HomeController extends Controller
      */
     public function index()
     {
+
         $html = $this->getHtmlForHierarchy(); //for left navigation
         $dataForPreviousValues = $this->PreviousValues(18); //for live graph
         $dataForTable = $this->TableValue(18); //for Table
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
+
+        $user = \Auth::user();
+        $associated_id = $user->asso_id;
+        if($associated_id == 0){
+            $html = '';//$this->getHTMLforAdmin();
+            return view('adminPanel.adminDashboard', compact('html'));
+        }
+        else {
+            $html = $this->getHtmlForHierarchy(); //for left navigation
+            $dataForPreviousValues = $this->PreviousValues(); //for live graph
+            $dataForTable = $this->TableValue(4); //for Table
+            return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+        }
     }
 
 
@@ -128,6 +143,18 @@ class HomeController extends Controller
 //    =============================New Company Insertion from CSV Parser Code FINISH==================================
 
 
+//    =============================New USER Insertion from form BELOW==================================
+public function AdminPanelNewUser(Request $request){
+    $name = $request->get('inputName3');
+    $email = $request->get('inputEmail3');
+    $password = bcrypt($request->get('inputPassword3'));
+    $asso_id = $request->get('inputAsso3');
+
+    $root = User::create(['name' => $name, 'email' => $email, 'password' => $password, 'asso_id' => $asso_id]);   //Creating node
+}
+//    =============================New USER Insertion from form Finish==================================
+
+
     // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ----------------------------
     /**
      * Recursive function that returns tree for a given node.
@@ -153,7 +180,7 @@ class HomeController extends Controller
             $html = $html . "<li>"
                           . "<a href='/"
                           .env('URL_ENTITY', 'auto')
-                          ."/{$node->id}'><span>{$node->name}</span></a>";
+                          ."/{$node->id}'><i class='fa fa-circle'></i><span>{$node->name}</span></a>";
         }
 
         $html = $html . "</li>";
@@ -167,8 +194,10 @@ class HomeController extends Controller
      */
     public function getHtmlForHierarchy() {
 
+        $user = \Auth::user();
+        $associated_id = $user->asso_id;
         //get the descendants of the given company for sidebar hierarchy into a collection
-        $companyHierarchyCollection = Company::where('name', '=', 'N2P2 Pvt. Ltd.')
+        $companyHierarchyCollection = Company::where('id', '=', $associated_id)
                                         ->first()->getDescendants()->toHierarchy();
 
         global $html;
@@ -179,8 +208,6 @@ class HomeController extends Controller
         return $html;
     }
     // -----------------------LEFT NAVIGATION HIERARCHY CODE Finish ----------------------------
-
-
 
     // -----------------------GRAPH REQUIRED CODE BELOW ----------------------------------------
     public function PreviousValues($nodeId)
@@ -267,14 +294,10 @@ class HomeController extends Controller
     }
     // ----------------------- GRAPH CODE Finish------------------------------------------------
 
-
-
     public function testing()
     {
-        return view('pages.mapping');
+        return "inside testing function in home controller";
     }
-
-
 
 //    =========================Table Generation Code BELOW======================================
     public function TableFromHierarchy($nodeId)
