@@ -31,15 +31,25 @@ Route::controllers([
 Route::get('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@getLogin'));
 Route::post('/login', array('as' => 'login', 'uses' => 'Auth\AuthController@postLogin'));
 Route::get('/logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@getLogout'));
-Route::post('liveGraphValues', 'HomeController@LiveValues');
+Route::post('/liveGraphValues', 'HomeController@LiveValues');
 //Show live graph if a meter name is clicked
 Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@TableFromHierarchy']);
+Route::get('/'.env('URL_ENTITY', 'auto').'/{c}/pdf', ['uses' =>'PDFController@PDFGen']);
+
 //Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c){$data['c'] = $c;return View::make('maincontent', $data);});
 //Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c) {
 //	echo "Entity id chosen is : ".$c;
 //});
 
 //<<<<<<<<<<<<<<--------------FOR TESTING PURPOSES ONLY-------------->>>>>>>>>>>>//
+
+Route::get('pdf', 'PDFController@PDFGen');
+
+Route::get('check', 'HomeController@showProfile');
+
+Route::get('test', 'HomeController@testing');
+
+
 // make a sample hierarchy in thr database
 Route::get('/makehierarchy',function(){
 
