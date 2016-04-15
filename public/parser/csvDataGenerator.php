@@ -7,7 +7,7 @@ $noOfMeters= 8;
 $file_name = "multi_test.csv";
 while($f==0) {
     $display_msg = "Values added - ";
-    $date = date("d-m-y");
+    $date = date("d-m-Y");
     $time = date("H:i:s");
     $each_line_in_file = "".$date.",".$time.","."22,1,1,";
     for($i=0;$i<$noOfMeters;$i++) {
