@@ -3,6 +3,7 @@
 use App\Company;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\parameterDetails;
 use Input;
 use Response;
 
@@ -19,13 +20,19 @@ class SearchController extends Controller {
     public function query()
     {
         $query = Input::get('user');
-        $res   = Company::select('name')->where('name', 'LIKE', "%$query%")->take(10)->get();
+        $user = \Auth::user();
+        $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
+        $searchResults   = Company::where('name', 'LIKE', "%$query%")->take(10)->get();
+
+        $parentCompany = Company::where('id','=',$assocIdOfCurrentUser)->first()->getRoot();
         $result = array();
-//        foreach($res as $r)
-//        {
-//            $result[] = $r;
-//        }
-        return Response::json($res);
+
+        foreach($searchResults as $individualResult){
+            if($individualResult->isDescendantOf($parentCompany)){
+                $result[] = ['id'=>$individualResult->id,'name'=>$individualResult->name];
+            }
+        }
+        return Response::json($result);
     }
 
     public function searchDescendant(){

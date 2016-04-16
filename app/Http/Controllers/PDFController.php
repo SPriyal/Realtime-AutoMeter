@@ -31,7 +31,7 @@ class MYPDF extends \TCPDF
     public function Header()
     {
         $value = Session::get('nodeID');
-        $parent = Company::where('id', '12')->first()->getRoot();
+        $parent = Company::where('id',$value)->first()->getRoot();
         $node = Company::where('id', $value)->first();
         //echo $node['name'];
         foreach ($node->getDescendantsAndSelf() as $descendant) {
@@ -61,6 +61,7 @@ class MYPDF extends \TCPDF
         date_default_timezone_set("Asia/Kolkata");
         //$this->Cell(0, 5, 'Time ' . date("d/m/y") . ' - ' . date("h:i:sa"), 0, false, 'l', 0, '', 0, false, 'T', 'M');
     }
+
 }
 
 
