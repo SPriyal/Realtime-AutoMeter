@@ -67,6 +67,34 @@ class HomeController extends Controller
             }
         }
     }
+    public function TableFromHierarchy($nodeId)
+    {
+        $user = \Auth::user();
+        $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
+        $objectOfNodeId = Company::where('id','=',$nodeId)->first();
+        $objectOfAssocIdOfCurrentUser = Company::where('id', '=', $assocIdOfCurrentUser)->first();
+        if($objectOfNodeId) {
+            if ($objectOfNodeId->isDescendantOf($objectOfAssocIdOfCurrentUser)) {
+                if ($objectOfNodeId->isLeaf()) {
+                    $idOfFirstLeafOfCurrentUser = $objectOfNodeId['id'];
+                } else {
+                    $objectOfLeafIdOfRequestedNode = $objectOfNodeId->getLeaves()->first();
+                    $idOfFirstLeafOfCurrentUser = $objectOfLeafIdOfRequestedNode['id'];
+                }
+                $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser);
+                Session::set('nodeID', $idOfFirstLeafOfCurrentUser);
+                $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
+                $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+            }
+            else {
+                echo "Node Id not in the scope of user! Contact Administrator";
+            }
+        } else{
+            echo "Invalid Association ID. Contact Administrator!";
+        }
+    }
+
 
 
 
@@ -334,17 +362,6 @@ public function AdminPanelNewUser(Request $request){
 
 
 //    =========================Table Generation Code BELOW======================================
-    public function TableFromHierarchy($nodeId)
-    {
-        $user = \Auth::user();
-        $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
-        $dataForTable = $this->TableValue($nodeId);
-        Session::set('nodeID', $nodeId);
-        $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              
-//        echo $dataForPreviousValues;
-        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
-    }
     public function TableValue($meterIdFromHierarchy)
     {
         $query = Data::select('parameter_id','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
