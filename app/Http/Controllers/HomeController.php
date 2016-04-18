@@ -44,12 +44,16 @@ class HomeController extends Controller
     public function index()
     {
 
+        $user = \Auth::user();
+        $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
+        $idOfFirstLeafOfCurrentUserAssocId = Company::where('id','=',$assocIdOfCurrentUser)
+                                                        ->first()->getLeaves()->first();
         $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues(18); //for live graph
-        $dataForTable = $this->TableValue(18); //for Table
+        $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUserAssocId['id']); //for live graph
+        $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUserAssocId['id']); //for Table
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
 
-        $user = \Auth::user();
+        $user = \Auth::user();              //TODO - What about this following code, coming after return statement
         $associated_id = $user->asso_id;
         if($associated_id == 0){
             $html = '';//$this->getHTMLforAdmin();
@@ -57,11 +61,12 @@ class HomeController extends Controller
         }
         else {
             $html = $this->getHtmlForHierarchy(); //for left navigation
-            $dataForPreviousValues = $this->PreviousValues(); //for live graph
-            $dataForTable = $this->TableValue(4); //for Table
+            $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUserAssocId['id']); //for live graph
+            $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUserAssocId['id']); //for Table
             return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
         }
     }
+
 
 
 //    =============================New Company Insertion from CSV Parser Code BELOW==================================
@@ -143,6 +148,8 @@ class HomeController extends Controller
 //    =============================New Company Insertion from CSV Parser Code FINISH==================================
 
 
+
+
 //    =============================New USER Insertion from form BELOW==================================
 public function AdminPanelNewUser(Request $request){
     $name = $request->get('inputName3');
@@ -153,6 +160,8 @@ public function AdminPanelNewUser(Request $request){
     $root = User::create(['name' => $name, 'email' => $email, 'password' => $password, 'asso_id' => $asso_id]);   //Creating node
 }
 //    =============================New USER Insertion from form Finish==================================
+
+
 
 
     // -----------------------LEFT NAVIGATION HIERARCHY CODE BELOW ----------------------------
@@ -209,6 +218,9 @@ public function AdminPanelNewUser(Request $request){
     }
     // -----------------------LEFT NAVIGATION HIERARCHY CODE Finish ----------------------------
 
+
+
+
     // -----------------------GRAPH REQUIRED CODE BELOW ----------------------------------------
     public function PreviousValues($nodeId)
     {
@@ -260,6 +272,7 @@ public function AdminPanelNewUser(Request $request){
     }
     /**
      * @param $RequiredStartTimeOfShift
+     * @return array
      */
     public function fetchData($RequiredStartTimeOfShift,$nodeId)
     {
@@ -294,6 +307,9 @@ public function AdminPanelNewUser(Request $request){
     }
     // ----------------------- GRAPH CODE Finish------------------------------------------------
 
+
+
+
     public function testing()
     {
         return "inside testing function in home controller";
@@ -312,6 +328,9 @@ public function AdminPanelNewUser(Request $request){
 //        echo $parent;
 
     }
+
+
+
 
 //    =========================Table Generation Code BELOW======================================
     public function TableFromHierarchy($nodeId)

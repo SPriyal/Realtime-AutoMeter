@@ -12,7 +12,7 @@
 
 <script src="/js/TypeAhead/typeahead.bundle.js"></script>
 <script src="/js/TypeAhead/taMain.js"></script>
-{{--<script src="{{ asset ("/js/TypeAhead/taMain.js") }}></script>--}}
+{{--<script src="{{ asset ("/js/TypeAhead/TypeAheadMain.js") }}></script>--}}
 </body>
 
 </html>
