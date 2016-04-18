@@ -105,7 +105,7 @@ class PDFController extends Controller
             $result = Data::select('parameter_id', 'value', 'DateTime')
                 ->where('meter_id', $SiblingsID[$a])
                 ->where('DateTime', '>', $TestStartCall)
-                ->where('DateTime', '<', $TestEnd)
+               // ->where('DateTime', '<', $TestEnd)
                 ->get();
 //                ->groupBy(function ($date) {
 //                    echo Carbon::parse($date->created_at)->format('h '); // grouping by hours
