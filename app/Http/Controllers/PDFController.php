@@ -32,7 +32,7 @@ class MYPDF extends \TCPDF
     public function Header()
     {
         $value = Session::get('nodeID');
-        $parent = Company::where('id', $value)->first()->getRoot();
+        $parent = Company::where('id',$value)->first()->getRoot();
         $node = Company::where('id', $value)->first();
         foreach ($node->getDescendantsAndSelf() as $descendant) {
             $result = Company::where('id', $descendant->parent_id)->first();
@@ -59,6 +59,7 @@ class MYPDF extends \TCPDF
         date_default_timezone_set("Asia/Kolkata");
         $this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . '        ' . 'Report Generation Time ' . date("d/m/y") . ' - ' . date("h:i:sa"), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
+
 }
 
 

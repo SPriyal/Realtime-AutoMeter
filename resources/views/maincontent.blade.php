@@ -28,32 +28,7 @@
 			</div><!-- /.box-body -->
 		</div><!-- /.box -->
 
-        <div class="box box-default">
-			<div class="box-header with-border">
-				<h3 class="box-title">Admin Panel</h3>
-				<div class="box-tools pull-right">
-					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-				</div><!-- /.box-tools -->
-			</div><!-- /.box-header -->
-			<div class="box-body">
-				{{--<- Live data Here ->--}}
-				<!-- Small boxes (Stat box) -->
-				<div class="row">
-					<div class="col-lg-3 col-xs-6">
-                        {!! Form::open(array('url'=>'adminPanel/Process','method'=>'POST', 'files'=>true)) !!}
-                        {!! Form::text('newCompanyName',null,array('placeholder' => 'Enter Company Name', 'class' => 'form-control')) !!}
-                        <br/>
-                        {!! Form::file('newCompanyCsvFile') !!}
-                        <p class="errors">{!!$errors->first('image')!!}</p>
-                        @if(Session::has('error'))
-                        <p class="errors">{!! Session::get('error') !!}</p>
-                        @endif
-                        {!! Form::submit('Submit', array('class'=>'btn btn-primary')) !!}
-                        {!!Form::close()!!}
-					</div><!-- ./col -->
-				</div><!-- /.row -->
-			</div><!-- /.box-body -->
-		</div><!-- /.box -->
+        
 
 		<div class="box box-default">
 			<div class="box-header with-border">
@@ -221,13 +196,12 @@
 //			console.log("Date - "+datePreviouslyTaken);
 			var arrayOfValuesOfCurrentMeter = new Array();
 
-			for($i=1;$i<feedbackLength;$i++){
-			    arrayOfValuesOfCurrentMeter.push(feedback[$i].value);
+			for($i=0;$i<feedbackLength;$i++){
+			    arrayOfValuesOfCurrentMeter.push(parseInt(feedback[$i].value));
 			}
 			var maximumIndexFromPrevious = indexOfMax(arrayOfValuesOfCurrentMeter);
 			var minimumIndexFromPrevious = indexOfMin(arrayOfValuesOfCurrentMeter);
             //Folowing is to initialize HTML elements with particular ids, so as to prevent error!
-//            var dateT = getTimeFromSqlDatTime(feedback[feedbackLength-1].DateTime);
             window.onload = settingElements();
             function settingElements() {
                 document.getElementById("currentValue").innerHTML = parseInt(feedback[feedbackLength-1].value);
@@ -238,8 +212,6 @@
                 document.getElementById("minimumValueDate").innerHTML = "("+moment(feedback[minimumIndexFromPrevious].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                 document.getElementById("averageValue").innerHTML = averageOfArray(arrayOfValuesOfCurrentMeter);
                 document.getElementById("startTimeEndTime").innerHTML = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
-//                document.getElementById("titleToGraph").innerHTML = ""+Date.createFromMysql(feedback[0].DateTime).toUTCString()+"&nbsp;&nbsp; to &nbsp;&nbsp;"+Date.createFromMysql(feedback[feedback.length-1].DateTime).toUTCString();
-//                document.getElementById("averageValueDate").innerHTML = "("+feedback[0].DateTime+" to <br/>"+feedback[feedbackLength-1].DateTime+")";
                 document.getElementById("titleToGraph").innerHTML = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
                 var allTilesParaUnits = document.getElementsByClassName("parameterUnit");
                 for($k=0;$k<allTilesParaUnits.length;$k++){
@@ -343,20 +315,21 @@
                                             if(feedback[feedback.length - 1].DateTime != feedbackLive[graphJSONincrementer].DateTime){
                                                 feedback.push(feedbackLive[graphJSONincrementer]);
     //                                            console.log("feedback[length] - "+feedback[feedback.length-1].DateTime);
-                                                arrayOfValuesOfCurrentMeter.push(feedback[feedback.length-1].value);
+                                                arrayOfValuesOfCurrentMeter.push(parseInt(feedback[feedback.length-1].value));
                                                 var maximumIndexLive = indexOfMax(arrayOfValuesOfCurrentMeter);
                                                 var minimumIndexLive = indexOfMin(arrayOfValuesOfCurrentMeter);
     //
                                                 window.onload = settingElements();
                                                 function settingElements() {
                                                     document.getElementById("currentValue").innerHTML = parseInt(feedback[feedback.length-1].value);
-                                                    document.getElementById("currentValueDate").innerHTML = "(" +feedback[feedback.length-1].DateTime+")";
+                                                    document.getElementById("currentValueDate").innerHTML = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                                                     document.getElementById("maximumValue").innerHTML = parseInt(feedback[maximumIndexLive].value);
-                                                    document.getElementById("maximumValueDate").innerHTML = "("+feedback[maximumIndexLive].DateTime+")";
+                                                    document.getElementById("maximumValueDate").innerHTML = "("+moment(feedback[maximumIndexLive].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                                                     document.getElementById("minimumValue").innerHTML = parseInt(feedback[minimumIndexLive].value);
-                                                    document.getElementById("minimumValueDate").innerHTML = "("+feedback[minimumIndexLive].DateTime+")";
+                                                    document.getElementById("minimumValueDate").innerHTML = "("+moment(feedback[minimumIndexLive].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                                                     document.getElementById("averageValue").innerHTML = averageOfArray(arrayOfValuesOfCurrentMeter);
-                                                    document.getElementById("startTimeEndTime").innerHTML = "*<b><u>Start Time</u> - </b>"+feedback[0].DateTime+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+feedback[feedback.length-1].DateTime;
+                                                    document.getElementById("startTimeEndTime").innerHTML = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
+                                                    document.getElementById("titleToGraph").innerHTML = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
                                     //                document.getElementById("averageValueDate").innerHTML = "("+feedback[0].DateTime+" to <br/>"+feedback[feedbackLength-1].DateTime+")";
                                                 }
 
@@ -510,7 +483,7 @@
                 }
 
             }
-//            console.log("end Max Value is "+arr[maxIndex]);
+//            console.log("end Max Value is at "+maxIndex + "and its value is "+arr[maxIndex]);
             return maxIndex;
         }
 
@@ -520,6 +493,7 @@
             }
             var min = arr[0];
             var minIndex = 0;
+//            console.log("start Min Value is "+min);
             for (var i = 1; i < arr.length; i++) {
                 if (arr[i] < min) {
                     minIndex = i;
@@ -527,6 +501,7 @@
                 }
 
             }
+//            console.log("end Min Value is at "+minIndex + "and its value is "+arr[minIndex]);
             return minIndex;
         }
 
@@ -542,7 +517,7 @@
             var i=0;
             var sum =0;
             for(i=0;i<arr.length;i++){
-//                console.log("Array element is "+arr[i]);
+//                console.log("<br/>:::::Array["+i+"] = "+arr[i]);
                 sum += parseInt(arr[i]);
             }
 //            console.log("Last Array element is "+arr[arr.length-1]);
