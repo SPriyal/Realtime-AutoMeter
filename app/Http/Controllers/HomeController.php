@@ -46,24 +46,35 @@ class HomeController extends Controller
 
         $user = \Auth::user();
         $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
-        $idOfFirstLeafOfCurrentUserAssocId = Company::where('id','=',$assocIdOfCurrentUser)
-                                                        ->first()->getLeaves()->first();
-        $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUserAssocId['id']); //for live graph
-        $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUserAssocId['id']); //for Table
-        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
 
-        $user = \Auth::user();              //TODO - What about this following code, coming after return statement
-        $associated_id = $user->asso_id;
-        if($associated_id == 0){
-            $html = '';//$this->getHTMLforAdmin();
-            return view('adminPanel.adminDashboard', compact('html'));
-        }
-        else {
-            $html = $this->getHtmlForHierarchy(); //for left navigation
-            $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUserAssocId['id']); //for live graph
-            $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUserAssocId['id']); //for Table
+        $objectOfAssocIdOfCurrentUser = Company::where('id','=',$assocIdOfCurrentUser)
+                                                        ->first();
+        if($objectOfAssocIdOfCurrentUser) {
+            if ($objectOfAssocIdOfCurrentUser->isLeaf()) {
+                $idOfFirstLeafOfCurrentUser = $objectOfAssocIdOfCurrentUser['id'];
+            } else {
+                $objectOfLeafIdOfCurrentUser = $objectOfAssocIdOfCurrentUser->getLeaves()->first();
+                $idOfFirstLeafOfCurrentUser = $objectOfLeafIdOfCurrentUser['id'];
+            }
+
+            $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
+            $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
+            $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser); //for Table
             return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+
+            $user = \Auth::user();              //TODO - What about this following code, coming after return statement
+            $associated_id = $user->asso_id;
+            if ($associated_id == 0) {
+                $html = '';//$this->getHTMLforAdmin();
+                return view('adminPanel.adminDashboard', compact('html'));
+            } else {
+                $html = $this->getHtmlForHierarchy(); //for left navigation
+                $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
+                $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser); //for Table
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+            }
+        } else{
+            echo "Invalid Association ID!!!! Contact Administrator!";
         }
     }
 
@@ -201,10 +212,10 @@ public function AdminPanelNewUser(Request $request){
      * @return string
      * @internal param $companyHierarchyCollection
      */
-    public function getHtmlForHierarchy() {
+    public function getHtmlForHierarchy($associated_id) {
 
-        $user = \Auth::user();
-        $associated_id = $user->asso_id;
+//        $user = \Auth::user();
+//        $associated_id = $user->asso_id;
         //get the descendants of the given company for sidebar hierarchy into a collection
         $companyHierarchyCollection = Company::where('id', '=', $associated_id)
                                         ->first()->getDescendants()->toHierarchy();
@@ -335,9 +346,11 @@ public function AdminPanelNewUser(Request $request){
 //    =========================Table Generation Code BELOW======================================
     public function TableFromHierarchy($nodeId)
     {
+        $user = \Auth::user();
+        $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
         $dataForTable = $this->TableValue($nodeId);
         Session::set('nodeID', $nodeId);
-        $html = $this->getHtmlForHierarchy(); //for left navigation
+        $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
         $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              
 //        echo $dataForPreviousValues;
         return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
