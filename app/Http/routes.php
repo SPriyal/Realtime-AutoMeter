@@ -73,7 +73,7 @@ Route::post('/searchResult', 'SearchController@searchResult');
 //=================================Graph & Table related routes BELOW=============================================
 Route::post('liveGraphValues/{nodeId}',['uses' => 'HomeController@LiveValues']);    // gives live reading for selected node
 Route::post('/liveGraphValues', 'HomeController@LiveValues');   //gives live readings for default node
-Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@TableFromHierarchy']);   //loads index page for selected node
+Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@indexForMeterFromHierarchy']);   //loads index page for selected node
 //=================================Graph & Table related routes FINISH=============================================
 
 

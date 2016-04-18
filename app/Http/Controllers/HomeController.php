@@ -41,9 +41,9 @@ class HomeController extends Controller
      *
      * @return Response
      */
+//    =================================Index Page Related Code BELOW==============================================
     public function index()
     {
-
         $user = \Auth::user();
         $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
         if ($assocIdOfCurrentUser == 0) {
@@ -67,7 +67,7 @@ class HomeController extends Controller
             }
         }
     }
-    public function TableFromHierarchy($nodeId)
+    public function indexForMeterFromHierarchy($nodeId)
     {
         $user = \Auth::user();
         $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
@@ -94,7 +94,7 @@ class HomeController extends Controller
             echo "Invalid Association ID. Contact Administrator!";
         }
     }
-
+//    =================================Index Page Related Code FINISH==============================================
 
 
 
