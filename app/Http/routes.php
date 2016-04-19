@@ -36,7 +36,7 @@ Route::get('/logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@get
 
 
 //==========================New Company Insertion routes BELOW===========================
-Route::post('adminPanel/Process','HomeController@processAdminPanelNewCompany');
+Route::post('adminPanel/Process','NewCompanyController@processAdminPanelNewCompany');
 Route::get('/addcompany',function(){
     return view('adminPanel.addCompany');
 });
