@@ -50,14 +50,19 @@ class HomeController extends Controller
             if ($objectOfAssocIdOfCurrentUser) {
                 if ($objectOfAssocIdOfCurrentUser->isLeaf()) {
                     $idOfFirstLeafOfCurrentUser = $objectOfAssocIdOfCurrentUser['id'];
+                    $leafMeterObject = $objectOfAssocIdOfCurrentUser;
                 } else {
                     $objectOfLeafIdOfCurrentUser = $objectOfAssocIdOfCurrentUser->getLeaves()->first();
                     $idOfFirstLeafOfCurrentUser = $objectOfLeafIdOfCurrentUser['id'];
+                    $leafMeterObject = $objectOfLeafIdOfCurrentUser;
                 }
                 $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
                 $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
                 $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser); //for Table
-                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+                $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
+                $companyAndMeterNames = array();
+                $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
             } else {
                 echo "Invalid Association ID. Contact Administrator!";
             }
@@ -73,15 +78,20 @@ class HomeController extends Controller
             if ($objectOfNodeId->isDescendantOf($objectOfAssocIdOfCurrentUser)) {
                 if ($objectOfNodeId->isLeaf()) {
                     $idOfFirstLeafOfCurrentUser = $objectOfNodeId['id'];
+                    $leafMeterObject = $objectOfNodeId;
                 } else {
                     $objectOfLeafIdOfRequestedNode = $objectOfNodeId->getLeaves()->first();
                     $idOfFirstLeafOfCurrentUser = $objectOfLeafIdOfRequestedNode['id'];
+                    $leafMeterObject = $objectOfLeafIdOfRequestedNode;
                 }
                 $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser);
                 Session::set('nodeID', $idOfFirstLeafOfCurrentUser);
                 $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
                 $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
-                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+                $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
+                $companyAndMeterNames = array();
+                $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
             }
             else {
                 echo "Node Id not in the scope of user! Contact Administrator";
