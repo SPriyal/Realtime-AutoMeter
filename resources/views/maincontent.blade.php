@@ -2,6 +2,8 @@
 
 @section('contentFourBox')
 
+        <h2>Data for {{$companyAndMeterNames[0]['meterName']}}</h2>
+
         <div class="box box-default">
 			<div class="box-header with-border">
 				<h3 class="box-title">Search</h3>

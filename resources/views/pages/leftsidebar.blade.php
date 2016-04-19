@@ -12,7 +12,7 @@
       {{--<div class="pull-left info">--}}
         {{--<p>TEXT 1</p>--}}
         <!-- Status -->
-        <a href="#"><i class="fa fa-building fa-2x text-blue"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; XYZ Solutions pvt ltd</a>
+        <a href="home"><i class="fa fa-building fa-2x text-blue"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{$companyAndMeterNames[0]['companyName']}}</a>
       {{--</div>--}}
     </div>
 
