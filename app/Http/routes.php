@@ -145,14 +145,13 @@ Route::get('/makehierarchy',function(){
 //=================================Seeding of sample data into DB without dataGenerator related routes BELOW=============================================
 //seed the databse with meter data for the specified date for 24 hours - data per second
 Route::get('/timeseed',function(){
-    for($i=0;$i<=23;$i++){
-        for($j=0;$j<=59;$j++){
-            for($k=0;$k<=59;$k++){
-                DB::insert('INSERT INTO `data` (`meter_id`, `parameter_name`, `value`, `DateTime`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)',
-                    ['4', 'k', rand(10,100), '2015-11-16 '.$i.':'.$j.':'.$k, '0000-00-00 00:00:00', '0000-00-00 00:00:00']);
-
-            }}}
-
+	for($i=0;$i<=23;$i++){
+	for($j=0;$j<=59;$j++){
+	//for($k=0;$k<=59;$k++){
+		DB::insert('INSERT INTO `data` (`meter_id`, `parameter_id`, `value`, `DateTime`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)',
+			['3', '1', rand(10,100), '2016-04-19 '.$i.':'.$j.':00', '0000-00-00 00:00:00', '0000-00-00 00:00:00']);
+	//}
+    }}
 });
 //=================================Seeding of sample data into DB without dataGenerator related routes FINISH=============================================
 
