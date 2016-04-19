@@ -59,7 +59,6 @@ class MYPDF extends \TCPDF
         date_default_timezone_set("Asia/Kolkata");
         $this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . '        ' . 'Report Generation Time ' . date("d/m/y") . ' - ' . date("h:i:sa"), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
-
 }
 
 
@@ -91,7 +90,6 @@ class PDFController extends Controller
         foreach ($parentid->getDescendants() as $siblings) {
             $SiblingsID[$i] = $siblings['id'];
             $i++;
-
         }
 
         $pdf->AddPage();
@@ -102,16 +100,12 @@ class PDFController extends Controller
         for ($a = 0; $a < sizeof($SiblingsID); $a++) {
 
             $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
-            $result = Data::select('parameter_id', 'value', 'DateTime')
+            $result = Data::select('id','parameter_id', 'value', 'DateTime')
+                ->havingRaw('id%60 = 0')
                 ->where('meter_id', $SiblingsID[$a])
                 ->where('DateTime', '>', $TestStartCall)
-               // ->where('DateTime', '<', $TestEnd)
+                ->where('DateTime', '<', $TestEnd)
                 ->get();
-//                ->groupBy(function ($date) {
-//                    echo Carbon::parse($date->created_at)->format('h '); // grouping by hours
-//
-//                });
-//            echo $result;
             $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
             $result2 = parameterDetails::select('unit')->where('id', $result[0]['parameter_id'])->get();
 
@@ -120,29 +114,10 @@ class PDFController extends Controller
             $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
             $html = '<h2 align="center"><b> </b></h2>';
             $pdf->writeHTML($html, true, false, true, false, '');
-
-
-
-
-
-            $visitorTraffic = Data::select('parameter_id', 'value', 'DateTime')->where('meter_id', $SiblingsID[$a])
-                ->get()
-                ->groupBy(function ($date) {
-                    return Carbon::parse($date->created_at)->format('h'); // grouping by hours
-                    //return Carbon::parse($date->created_at)->format('m'); // grouping by months
-                });
-            //echo $visitorTraffic;
-
-
-
-
-
-
             $pdf->SetFont('Times', '', 12);
             foreach ($header as $heading) {
                 foreach ($heading as $column_heading)
                     $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
-
             }
             $b = 1;
             foreach ($result as $row) {
@@ -180,9 +155,9 @@ EOD;
 
         $shiftCheckResult = $this->shiftCheck();
         $GLOBALS['$shiftCheckResult'] = $this->shiftCheck();
-        if ($shiftCheckResult == "day") {
+        if ($shiftCheckResult == "day" || $shiftCheckResult == "night") {
             $TestStart = date("Y-m-d 08:00:00");
-        } else if ($shiftCheckResult == "night" || $shiftCheckResult == "midnight") {
+        } else if ($shiftCheckResult == "midnight") {
             $TestStart = date("Y-m-d 08:00:00", strtotime("-1 day"));
         }
         return $TestStart;

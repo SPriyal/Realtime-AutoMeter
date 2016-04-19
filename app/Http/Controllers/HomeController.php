@@ -3,13 +3,9 @@
 use App\Company;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Input;
-use File;
-use Validator;
 use Illuminate\Support\Facades\Session as Session;
 use DB;
-use App\testdata as testdata;
 use App\parameterDetails as Parameter;
 use App\Data as Data;
 
@@ -41,111 +37,70 @@ class HomeController extends Controller
      *
      * @return Response
      */
+//    =================================Index Page Related Code BELOW==============================================
     public function index()
     {
-
         $user = \Auth::user();
         $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
-        $idOfFirstLeafOfCurrentUserAssocId = Company::where('id','=',$assocIdOfCurrentUser)
-                                                        ->first()->getLeaves()->first();
-        $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUserAssocId['id']); //for live graph
-        $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUserAssocId['id']); //for Table
-        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
-
-        $user = \Auth::user();              //TODO - What about this following code, coming after return statement
-        $associated_id = $user->asso_id;
-        if($associated_id == 0){
+        if ($assocIdOfCurrentUser == 0) {
             $html = '';//$this->getHTMLforAdmin();
             return view('adminPanel.adminDashboard', compact('html'));
-        }
-        else {
-            $html = $this->getHtmlForHierarchy(); //for left navigation
-            $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUserAssocId['id']); //for live graph
-            $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUserAssocId['id']); //for Table
-            return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable'));
+        } else{
+            $objectOfAssocIdOfCurrentUser = Company::where('id', '=', $assocIdOfCurrentUser)->first();
+            if ($objectOfAssocIdOfCurrentUser) {
+                if ($objectOfAssocIdOfCurrentUser->isLeaf()) {
+                    $idOfFirstLeafOfCurrentUser = $objectOfAssocIdOfCurrentUser['id'];
+                    $leafMeterObject = $objectOfAssocIdOfCurrentUser;
+                } else {
+                    $objectOfLeafIdOfCurrentUser = $objectOfAssocIdOfCurrentUser->getLeaves()->first();
+                    $idOfFirstLeafOfCurrentUser = $objectOfLeafIdOfCurrentUser['id'];
+                    $leafMeterObject = $objectOfLeafIdOfCurrentUser;
+                }
+                $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
+                $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
+                $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser); //for Table
+                $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
+                $companyAndMeterNames = array();
+                $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
+            } else {
+                echo "Invalid Association ID. Contact Administrator!";
+            }
         }
     }
-
-
-
-//    =============================New Company Insertion from CSV Parser Code BELOW==================================
-    public function processAdminPanelNewCompany(Request $request){
-        date_default_timezone_set('Asia/Kolkata');
-        $nowDateTime = date("d_m_Y-H_i_s");
-        $newFile = $request->file('newCompanyCsvFile');
-        $newCompanyName = $request->get('newCompanyName');
-//        $newCompanyCsvFileName = $request->get('newCompanyCsvFileName') ;
-//        echo "Company name is :".$newCompanyName.":...";
-//        $rules = array('newCompanyCsvFile' => 'required',);
-//        $validator = Validator::make($newFile, $rules);
-//        if ($validator->fails()) {
-//            // send back to the page with the input data and errors
-//            return Redirect::to('upload')->withInput()->withErrors($validator);
-//        }
-//        else
-        if($newCompanyName!="")
-        {
-            if ($newFile->isValid()) {
-                $extension = $newFile->getClientOriginalExtension(); // getting extension
-                $fileName = $newCompanyName.'_'.$nowDateTime.'.'.$extension;
-                Storage::disk('local')->put($fileName,  File::get($newFile));
-                Session::flash('success', 'Upload successfully');
-//              Some variable initializations
-                $i=0;
-                foreach(file($newFile) as $line){
-                    $companyFileArray[$i] = $line;
-                    $i++;
+    public function indexForMeterFromHierarchy($nodeId)
+    {
+        $user = \Auth::user();
+        $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
+        $objectOfNodeId = Company::where('id','=',$nodeId)->first();
+        $objectOfAssocIdOfCurrentUser = Company::where('id', '=', $assocIdOfCurrentUser)->first();
+        if($objectOfNodeId) {
+            if ($objectOfNodeId->isDescendantOf($objectOfAssocIdOfCurrentUser)) {
+                if ($objectOfNodeId->isLeaf()) {
+                    $idOfFirstLeafOfCurrentUser = $objectOfNodeId['id'];
+                    $leafMeterObject = $objectOfNodeId;
+                } else {
+                    $objectOfLeafIdOfRequestedNode = $objectOfNodeId->getLeaves()->first();
+                    $idOfFirstLeafOfCurrentUser = $objectOfLeafIdOfRequestedNode['id'];
+                    $leafMeterObject = $objectOfLeafIdOfRequestedNode;
                 }
-                for($i=0;$i<sizeof($companyFileArray);$i++){
-                    $companyDetailsIn2dArray[$i] =str_getcsv($companyFileArray[$i]);
-                }
-                $csvPath = $newCompanyName . '/';
-                $root = Company::create(['name' => $newCompanyName, 'csvFilePath' => $csvPath]);   //Creating node
-                $root->makeRoot();  //Making Root Node
-                for($i=0;$i<sizeof($companyDetailsIn2dArray);$i++){
-                    if($companyDetailsIn2dArray[$i][0]!=""){
-                        $this->addNewCompanyNode($root,$i,0,$companyDetailsIn2dArray,$csvPath);
-                    }
-                }
-                echo "File Parsed Successfully!";
+                $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser);
+                Session::set('nodeID', $idOfFirstLeafOfCurrentUser);
+                $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
+                $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
+                $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
+                $companyAndMeterNames = array();
+                $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
             }
             else {
-                // sending back with error message.
-                Session::flash('error', 'uploaded file is not valid');
+                echo "Node Id not in the scope of user! Contact Administrator";
             }
+        } else{
+            echo "Invalid Association ID. Contact Administrator!";
         }
     }
-    public function addNewCompanyNode($root,$I,$J,$contentForNode,$csvPath){
-        $newNode[$I][$J] = Company::create(['name' => $contentForNode[$I][$J], 'csvFilePath' => $csvPath]);
-        $newNode[$I][$J]->makeChildOf($root);
-        $childrenListForCurrentNode = $this->findChildNodeOfCurrentNode($I,$J,$contentForNode);
-        for($n=0;$n<sizeof($childrenListForCurrentNode);$n++){
-            $this->addNewCompanyNode($newNode[$I][$J],$childrenListForCurrentNode[$n],$J+1,$contentForNode,$csvPath);
-        }
-    }
-    public function findChildNodeOfCurrentNode($i,$j,$contentForNode){
-        $childrenLocationArray = array();
-        if($j+1<sizeof($contentForNode[$i])) {
-            if ($contentForNode[$i][$j + 1] != "") {
-                array_push($childrenLocationArray, $i);
-            }
-        }
-        for($m=$i+1;$m<sizeof($contentForNode);$m++){
-            if($contentForNode[$m][$j] == ""){
-                if($j+1<sizeof($contentForNode[$i])) {
-                    if ($contentForNode[$m][$j + 1] != "") {
-                        array_push($childrenLocationArray, $m);
-                    }
-                }
-            }
-            else{
-                break;
-            }
-        }
-        return $childrenLocationArray;
-    }
-//    =============================New Company Insertion from CSV Parser Code FINISH==================================
+//    =================================Index Page Related Code FINISH==============================================
 
 
 
@@ -201,10 +156,10 @@ public function AdminPanelNewUser(Request $request){
      * @return string
      * @internal param $companyHierarchyCollection
      */
-    public function getHtmlForHierarchy() {
+    public function getHtmlForHierarchy($associated_id) {
 
-        $user = \Auth::user();
-        $associated_id = $user->asso_id;
+//        $user = \Auth::user();
+//        $associated_id = $user->asso_id;
         //get the descendants of the given company for sidebar hierarchy into a collection
         $companyHierarchyCollection = Company::where('id', '=', $associated_id)
                                         ->first()->getDescendants()->toHierarchy();
@@ -309,7 +264,7 @@ public function AdminPanelNewUser(Request $request){
 
 
 
-
+//    =========================Testing function BELOW======================================
     public function testing()
     {
         return "inside testing function in home controller";
@@ -328,20 +283,12 @@ public function AdminPanelNewUser(Request $request){
 //        echo $parent;
 
     }
+//    =========================Testing function FINISH======================================
 
 
 
 
 //    =========================Table Generation Code BELOW======================================
-    public function TableFromHierarchy($nodeId)
-    {
-        $dataForTable = $this->TableValue($nodeId);
-        Session::set('nodeID', $nodeId);
-        $html = $this->getHtmlForHierarchy(); //for left navigation
-        $dataForPreviousValues = $this->PreviousValues($nodeId); //for live graph              
-//        echo $dataForPreviousValues;
-        return view('maincontent', compact('html','dataForPreviousValues','dataForTable'));
-    }
     public function TableValue($meterIdFromHierarchy)
     {
         $query = Data::select('parameter_id','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
