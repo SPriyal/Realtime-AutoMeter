@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Input;
 use Illuminate\Support\Facades\Session as Session;
 use DB;
+use App\parameterDetails;
 use App\parameterDetails as Parameter;
 use App\Data as Data;
 
@@ -292,12 +293,15 @@ public function AdminPanelNewUser(Request $request){
     public function TableValue($meterIdFromHierarchy)
     {
         $query = Data::select('parameter_id','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
+        $value = Session::get('nodeID');
+        $result1 = Company::select('name')->where('id', $value)->first();
+        $result2 = parameterDetails::select('unit')->where('id', $query[0]['parameter_id'])->get();
         $html1 = '';
         for($a = 0; $a<sizeof($query); $a++) {
             $html1 = $html1 . ' <tr>';
             $html1 = $html1 . '<td>'. ($a+'1') .'</td>';
-            $html1 = $html1 . '<td>'. $query[$a]['parameter_name'] .'</td>';
-            $html1 = $html1 . '<td>'. $query[$a]['value'] .'</td>';
+            $html1 = $html1 . '<td>'. $result1['name'] .'</td>';
+            $html1 = $html1 . '<td>'. $query[$a]['value']. ' ' . $result2[0]['unit'] .'</td>';
             $html1 = $html1 . '<td>'. $query[$a]['DateTime'] .'</td>';
             $html1 = $html1 . ' </tr>';
         }
