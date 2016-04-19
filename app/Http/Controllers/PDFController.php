@@ -106,33 +106,45 @@ class PDFController extends Controller
                 ->where('DateTime', '>', $TestStartCall)
                 ->where('DateTime', '<', $TestEnd)
                 ->get();
-            $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
-            $result2 = parameterDetails::select('unit')->where('id', $result[0]['parameter_id'])->get();
+//            echo $result;
+            if ( $result->count() == 0) {
+//                App::abort(404);
+                echo "Array is empty";
+                $flag = 0;
+            }
+            else {
+                $flag = 1;
+                $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+                $result2 = parameterDetails::select('unit')->where('id', $result[0]['parameter_id'])->get();
 
 // print a block of text using Write()
-            $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
-            $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
-            $html = '<h2 align="center"><b> </b></h2>';
-            $pdf->writeHTML($html, true, false, true, false, '');
-            $pdf->SetFont('Times', '', 12);
-            foreach ($header as $heading) {
-                foreach ($heading as $column_heading)
-                    $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                $html = '<h2 align="center"><b> </b></h2>';
+                $pdf->writeHTML($html, true, false, true, false, '');
+                $pdf->SetFont('Times', '', 12);
+                foreach ($header as $heading) {
+                    foreach ($heading as $column_heading)
+                        $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                }
+                $b = 1;
+                foreach ($result as $row) {
+                    $pdf->SetFont('Times', '', 10);
+                    $pdf->Ln();
+                    $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, $result1['name'], 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
+                    $b++;
+                }
+                $pdf->AddPage();
             }
-            $b = 1;
-            foreach ($result as $row) {
-                $pdf->SetFont('Times', '', 10);
-                $pdf->Ln();
-                $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
-                $pdf->Cell(35, 8, $result1['name'], 1, 0, 'C', 0, '', 3);
-                $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
-                $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
-                $b++;
-            }
-            $pdf->AddPage();
         }
 
-        $txt = <<<EOD
+
+        if ($flag != 0){
+
+            $txt = <<<EOD
 ============Report Summary============
 
 
@@ -143,9 +155,12 @@ Report  End  Time and Date: $TestEnd
 EOD;
 
 // print a block of text using Write()
-        $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+            $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
 
-        $pdf->Output();
+            $pdf->Output();
+
+        }
+
 
     }
 
