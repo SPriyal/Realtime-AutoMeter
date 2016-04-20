@@ -35,32 +35,6 @@ Route::get('/logout', array('as' => 'logout', 'uses' => 'Auth\AuthController@get
 
 
 
-//==========================New Company Insertion routes BELOW===========================
-Route::post('adminPanel/Process','NewCompanyController@processAdminPanelNewCompany');
-Route::get('/addcompany',function(){
-    return view('adminPanel.addCompany');
-});
-//==========================New Company Insertion routes FINISH===========================
-
-
-
-//==========================New User Insertion routes BELOW===========================
-Route::post('adminPanel/adduser','HomeController@AdminPanelNewUser');
-Route::get('/adduser',function(){
-    return view('adminPanel.addUser');
-});
-//==========================New User Insertion routes FINISH===========================
-
-
-
-//==================Mapping related routes BELOW [parameter & csvDataColumn mappings]==================
-Route::get('metermapping','MappingController@mappingIndexPage');
-Route::post('metermapping/Selection','MappingController@mappingSelectionPage');
-Route::post('metermapping/Selection/Submit','MappingController@mappingSubmit');
-//==================Mapping related routes FINISH [parameter & csvDataColumn mappings]==================
-
-
-
 //==========================Search related routes BELOW [TypeAhead]===========================
 Route::get('/taTest', 'SearchController@index');
 Route::get('/query', 'SearchController@query');
@@ -83,13 +57,34 @@ Route::get('/'.env('URL_ENTITY', 'auto').'/{c}/pdf', ['uses' =>'PDFController@PD
 //=================================PDF Report Generation related routes FINISH=============================================
 
 
+//********************************* **************** **************************************
+//********************************* ADMIN PANEL CODE **************************************
+//********************************* **************** **************************************
 
 
-//Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c){$data['c'] = $c;return View::make('maincontent', $data);});
-//Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', function($c) {
-//	echo "Entity id chosen is : ".$c;
-//});
+//==========================New Company Insertion routes BELOW=============================
+Route::post('adminPanel/Process','NewCompanyController@processAdminPanelNewCompany');
+Route::get('/addcompany',function(){
+    return view('adminPanel.addCompany');
+});
 
+//==========================New User Insertion routes BELOW================================
+Route::post('adminPanel/adduser','HomeController@AdminPanelNewUser');
+Route::get('/adduser',function(){
+    return view('adminPanel.addUser');
+});
+
+//==========================Database Accessing Routes BELOW================================
+Route::get('/companylist','GetDatabase@index');
+
+//==================Mapping related routes BELOW [parameter & csvDataColumn mappings]=======
+Route::get('metermapping','MappingController@mappingIndexPage');
+Route::post('metermapping/Selection','MappingController@mappingSelectionPage');
+Route::post('metermapping/Selection/Submit','MappingController@mappingSubmit');
+
+//********************************* *********************** *******************************
+//********************************* ADMIN PANEL CODE FINISH *******************************
+//********************************* *********************** *******************************
 
 //<<<<<<<<<<<<<<--------------FOR TESTING PURPOSES ONLY-------------->>>>>>>>>>>>//
 
