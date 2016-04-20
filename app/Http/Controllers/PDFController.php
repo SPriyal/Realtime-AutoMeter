@@ -108,8 +108,8 @@ class PDFController extends Controller
                 ->get();
 //            echo $result;
             if ( $result->count() == 0) {
-//                App::abort(404);
-                echo "Array is empty ";
+                App::abort(404);
+//                echo "Array is empty ";
                 $flag = 0;
             }
             else {
@@ -208,8 +208,8 @@ EOD;
                 ->get();
 //            echo $result;
             if ( $result->count() == 0) {
-//                App::abort(404);
-                echo "Array is empty ";
+                App::abort(404);
+//                echo "Array is empty ";
                 $flag = 0;
             }
             else {

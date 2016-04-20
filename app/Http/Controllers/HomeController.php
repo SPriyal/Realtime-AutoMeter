@@ -298,8 +298,8 @@ public function AdminPanelNewUser(Request $request){
             ->where('DateTime', '>', date('Y-m-d 08:00:00'))
             ->get();
         if ( $query->count() == 0) {
-//                App::abort(404);
-            echo "Array is empty ";
+                App::abort(404);
+//            echo "Array is empty ";
         }
         else {
             $value = Session::get('nodeID');
