@@ -293,9 +293,10 @@ public function AdminPanelNewUser(Request $request){
     public function TableValue($meterIdFromHierarchy)
     {
         $query = Data::select('id','parameter_id','value','DateTime')
-            ->havingRaw('id%10 = 0')
+//            ->havingRaw('id%10 = 0')
             ->where('meter_id',$meterIdFromHierarchy)
             ->where('DateTime', '>', date('Y-m-d 08:00:00'))
+            ->orderBy('DateTime','des')
             ->get();
         if ( $query->count() == 0) {
                 App::abort(404);
