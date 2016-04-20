@@ -2,7 +2,6 @@
 
 @section('content')
 
-    {!! Form::open(array('url'=>'adminPanel/adduser','method'=>'POST')) !!}
 
     <div class="box box-info">
         <div class="box-header with-border">
@@ -15,12 +14,41 @@
             {{--<- Live data Here ->--}}
             <!-- Small boxes (Stat box) -->
             <div class="row">
-                <div class="col-lg-3 col-xs-6">
+                <div class="col-lg-6 col-md-9 col-xs-12">
 
-                    {!! Form::text('inputName3',null,array('placeholder' => 'Name', 'class' => 'form-control')) !!}
-                    {!! Form::email('inputEmail3',null,array('placeholder' => 'Email id', 'class' => 'form-control')) !!}
-                    {!! Form::password('inputPassword3',null,array('placeholder' => 'Password', 'class' => 'form-control')) !!}
-                    {!! Form::text('inputAsso3',null,array('placeholder' => 'Associative ID', 'class' => 'form-control')) !!}
+                    <form class="form-horizontal" role="form" method="POST" action="{{ url('adminPanel/adduser') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                        <div class="form-group">
+                            <label for="inputName3" class="col-sm-3 control-label">Name</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="inputName3" placeholder="Name">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-3 control-label">Password</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="inputPassword3" placeholder="Password">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputAsso3" class="col-sm-3 control-label">Association ID</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="inputAsso3" placeholder="Access Id number">
+                            </div>
+                        </div>
+                        {!! Form::submit('Submit', array('class'=>'btn btn-primary pull-right')) !!}
+
+                    </form>
 
 
                     <p class="errors">{!!$errors->first('image')!!}</p>
@@ -31,8 +59,6 @@
             </div><!-- /.row -->
         </div><!-- /.box-body -->
         <div class="box-footer">
-            {!! Form::submit('Submit', array('class'=>'btn btn-primary')) !!}
-            {!!Form::close()!!}
         </div>
     </div><!-- /.box -->
 @endsection

@@ -20,11 +20,9 @@
                         </tr>
                         @for($i=0;$i<sizeof($meterIdListForSelectedCompany);$i++)
                         <tr>
-                            <td>{!!
-                                Form::label($meterNameListForSelectedCompany[$i],$meterNameListForSelectedCompany[$i])!!}
+                            <td>{!! Form::label($meterNameListForSelectedCompany[$i],$meterNameListForSelectedCompany[$i])!!}
                             </td>
-                            <td>{!! Form::text($meterIdListForSelectedCompany[$i],null,array('placeholder' => 'Enter
-                                Column in CSV', 'class' => 'form-control'))!!}
+                            <td>{!! Form::text($meterIdListForSelectedCompany[$i],null,array('placeholder' => 'Corresponding Column number', 'class' => 'form-control'))!!}
                             </td>
                             <td>
                                 <select id="parametersListID" class="form-control"

@@ -23,6 +23,23 @@
         </a>
       </li>
 
+      <li class="treeview">
+        <a href="#">
+          <i class="fa fa-table"></i> <span>Database</span>
+          <i class="fa fa-angle-left pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+          {{--show all companies with their respective ID--}}
+          <li><a href="/companylist"><i class="fa fa-circle-o"></i> Company List</a></li>
+          <li><a href="#"><i class="fa fa-circle-o"></i> Companies Table</a></li>
+          <li><a href="#"><i class="fa fa-circle-o"></i> Data</a></li>
+          <li><a href="#"><i class="fa fa-circle-o"></i> Parameters</a></li>
+          <li><a href="#"><i class="fa fa-circle-o"></i> Users</a></li>
+          <li><a href="#"><i class="fa fa-circle-o"></i> Change Password</a></li>
+        </ul>
+      </li>
+
+
       <li>
         <a href="#">
           <i class="fa fa-pie-chart"></i> <span>Analytics</span>
@@ -35,22 +52,6 @@
         </a>
       </li>
 
-
-      <li class="treeview">
-        <a href="#">
-          <i class="fa fa-table"></i> <span>Database</span>
-          <i class="fa fa-angle-left pull-right"></i>
-        </a>
-        <ul class="treeview-menu">
-          {{--show all companies with their respective ID--}}
-          <li><a href="pages/forms/general.html"><i class="fa fa-circle-o"></i> Company List</a></li>
-          <li><a href="pages/forms/general.html"><i class="fa fa-circle-o"></i> Companies Table</a></li>
-          <li><a href="pages/forms/advanced.html"><i class="fa fa-circle-o"></i> Data</a></li>
-          <li><a href="pages/forms/editors.html"><i class="fa fa-circle-o"></i> Parameters</a></li>
-          <li><a href="pages/forms/editors.html"><i class="fa fa-circle-o"></i> Users</a></li>
-          <li><a href="pages/forms/editors.html"><i class="fa fa-circle-o"></i> Change Password</a></li>
-        </ul>
-      </li>
 
       <li>
         <a href="#">
