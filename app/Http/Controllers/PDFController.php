@@ -95,7 +95,7 @@ class PDFController extends Controller
         $pdf->AddPage();
 
         $TestStartCall = $this->TimeCheck($value);
-        $TestEnd = date("Y-m-d h:i:s");
+        $TestEnd = date("Y-m-d G:i:s");
 
         for ($a = 0; $a < sizeof($SiblingsID); $a++) {
 
@@ -109,7 +109,7 @@ class PDFController extends Controller
 //            echo $result;
             if ( $result->count() == 0) {
 //                App::abort(404);
-                echo "Array is empty";
+                echo "Array is empty ";
                 $flag = 0;
             }
             else {

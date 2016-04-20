@@ -292,7 +292,11 @@ public function AdminPanelNewUser(Request $request){
 //    =========================Table Generation Code BELOW======================================
     public function TableValue($meterIdFromHierarchy)
     {
-        $query = Data::select('parameter_id','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
+        $query = Data::select('id','parameter_id','value','DateTime')
+            ->havingRaw('id%10 = 0')
+            ->where('meter_id',$meterIdFromHierarchy)
+            ->where('DateTime', '>', date('Y-m-d 08:00:00'))
+            ->get();
         $value = Session::get('nodeID');
         $result1 = Company::select('name')->where('id', $value)->first();
         $result2 = parameterDetails::select('unit')->where('id', $query[0]['parameter_id'])->get();
