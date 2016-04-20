@@ -80,6 +80,9 @@ Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@index
 
 //=================================PDF Report Generation related routes BELOW=============================================
 Route::get('/'.env('URL_ENTITY', 'auto').'/{c}/pdf', ['uses' =>'PDFController@PDFGen']);
+
+Route::get('/'.env('URL_ENTITY', 'auto').'/{c}/Yesterday', ['uses' =>'PDFController@PDFYesterday']);
+
 //=================================PDF Report Generation related routes FINISH=============================================
 
 
@@ -94,6 +97,8 @@ Route::get('/'.env('URL_ENTITY', 'auto').'/{c}/pdf', ['uses' =>'PDFController@PD
 //<<<<<<<<<<<<<<--------------FOR TESTING PURPOSES ONLY-------------->>>>>>>>>>>>//
 
 Route::get('pdf', 'PDFController@PDFGen');
+
+Route::get('Yesterday', 'PDFController@PDFYesterday');
 
 Route::get('check', 'HomeController@showProfile');
 
@@ -149,7 +154,7 @@ Route::get('/timeseed',function(){
 	for($j=0;$j<=59;$j++){
 	//for($k=0;$k<=59;$k++){
 		DB::insert('INSERT INTO `data` (`meter_id`, `parameter_id`, `value`, `DateTime`, `created_at`, `updated_at`) values (?, ?, ?, ?, ?, ?)',
-			['3', '1', rand(10,100), '2016-04-19 '.$i.':'.$j.':00', '0000-00-00 00:00:00', '0000-00-00 00:00:00']);
+			['5', '3', rand(10,100), '2016-04-21 '.$i.':'.$j.':00', '0000-00-00 00:00:00', '0000-00-00 00:00:00']);
 	//}
     }}
 });
