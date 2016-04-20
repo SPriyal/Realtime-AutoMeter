@@ -297,19 +297,25 @@ public function AdminPanelNewUser(Request $request){
             ->where('meter_id',$meterIdFromHierarchy)
             ->where('DateTime', '>', date('Y-m-d 08:00:00'))
             ->get();
-        $value = Session::get('nodeID');
-        $result1 = Company::select('name')->where('id', $value)->first();
-        $result2 = parameterDetails::select('unit')->where('id', $query[0]['parameter_id'])->get();
-        $html1 = '';
-        for($a = 0; $a<sizeof($query); $a++) {
-            $html1 = $html1 . ' <tr>';
-            $html1 = $html1 . '<td>'. ($a+'1') .'</td>';
-            $html1 = $html1 . '<td>'. $result1['name'] .'</td>';
-            $html1 = $html1 . '<td>'. $query[$a]['value']. ' ' . $result2[0]['unit'] .'</td>';
-            $html1 = $html1 . '<td>'. $query[$a]['DateTime'] .'</td>';
-            $html1 = $html1 . ' </tr>';
+        if ( $query->count() == 0) {
+//                App::abort(404);
+            echo "Array is empty ";
         }
-        return $html1;
+        else {
+            $value = Session::get('nodeID');
+            $result1 = Company::select('name')->where('id', $value)->first();
+            $result2 = parameterDetails::select('unit')->where('id', $query[0]['parameter_id'])->get();
+            $html1 = '';
+            for ($a = 0; $a < sizeof($query); $a++) {
+                $html1 = $html1 . ' <tr>';
+                $html1 = $html1 . '<td>' . ($a + '1') . '</td>';
+                $html1 = $html1 . '<td>' . $result1['name'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['value'] . ' ' . $result2[0]['unit'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['DateTime'] . '</td>';
+                $html1 = $html1 . ' </tr>';
+            }
+            return $html1;
+        }
     }
 //    =========================Table Generation Code FINISH======================================
 
