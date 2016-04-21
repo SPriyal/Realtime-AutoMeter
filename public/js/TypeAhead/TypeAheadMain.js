@@ -1,10 +1,10 @@
 jQuery(document).ready(function($) {
     var engine = new Bloodhound({
-        //remote: {
-        //    url: '/query?user=%QUERY',
-        //    wildcard: '%QUERY'
-        //},
-        prefetch: 'searchDescendant',
+        remote: {
+            url: '/query?user=%QUERY',
+            wildcard: '%QUERY'
+        },
+        //prefetch: 'searchDescendant',
         // '...' = displayKey: '...'
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace
@@ -16,8 +16,9 @@ jQuery(document).ready(function($) {
         hint: false,
         classNames: {
             input: 'form-control',
-            menu: 'form-control',
-            selectable: 'Typeahead-selectable'
+            menu: 'Typeahead-menu',
+            selectable: 'Typeahead-selectable',
+            hint: 'Typeahead-hint'
         },
         highlight: true
     }, {
@@ -28,13 +29,11 @@ jQuery(document).ready(function($) {
         displayKey: 'name',
         templates: {
             empty: [
-                '<div style="background: #FFFFFF; font-size: x-large;">',
-                'unable to find current query',
-                '</div>'
+                '<div style="background: #3c8dbc; font-size: 18px;">'+ 'No Results'+ '</div>'
             ].join('\n'),
             suggestion: function(variable){
                 //var link = /l/public/e/"+variable.id;
-                return '<a href="/l/public/e/'+variable.id+'"><div style="background: #FFFFFF; font-size: x-large;">'+variable.name+'  '+variable.id+'</div></a>'
+                return '<a href="/l/public/e/'+variable.id+'"><div style="background: #222d32; font-size: 18px;">'+'&nbsp&nbsp&nbsp&nbsp'+variable.name+'  ('+variable.id+')'+'&nbsp&nbsp&nbsp&nbsp'+'</div></a>'
                 //TODO - Hardcoded link above (URL_ENTITY)!
             }
         }
