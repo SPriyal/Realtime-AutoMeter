@@ -5,7 +5,7 @@
   <section class="sidebar">
 
     <ul class="sidebar-menu">
-      <li class="active">
+      <li>
         <a href="/addcompany">
           <i class="fa fa-share"></i> <span>Add Company</span>
         </a>
