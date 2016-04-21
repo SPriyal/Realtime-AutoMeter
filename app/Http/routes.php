@@ -70,9 +70,9 @@ Route::get('/addcompany',function(){
 
 //==========================New User Insertion routes BELOW================================
 Route::post('adminPanel/adduser','HomeController@AdminPanelNewUser');
-Route::get('/adduser',function(){
+Route::get('/adduser',['middleware' => 'admincheck',function(){
     return view('adminPanel.addUser');
-});
+}]);
 
 //==========================Database Accessing Routes BELOW================================
 Route::get('/companylist','GetDatabase@listOfCompanies');

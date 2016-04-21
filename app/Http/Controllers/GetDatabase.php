@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 
 class GetDatabase extends Controller {
 
+	public function __construct()
+	{
+		$this->middleware('admincheck');
+	}
+
 	public function listOfCompanies()
 	{
 		$query = Company::select('id','name','created_at')->where('depth',0)->get();
