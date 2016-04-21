@@ -1,8 +1,7 @@
 @extends('pages.dashboard')
 
 @section('contentFourBox')
-
-        <h2>Data for {{$companyAndMeterNames[0]['meterName']}}</h2>
+        <h3>Data for {{$companyAndMeterNames[0]['meterName']}}</h3>
 
         <div class="box box-default">
 			<div class="box-header with-border">

@@ -52,7 +52,7 @@
       </li>
 
 
-      <li>
+    {{--  <li>
         <a href="#">
           <i class="fa fa-calendar"></i> <span>Calendar</span>
         </a>
@@ -75,7 +75,7 @@
         <a href="#">
           <i class="fa fa-user"></i> <span>Profile</span>
         </a>
-      </li>
+      </li>--}}
 
       
       <li><a href="#"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
