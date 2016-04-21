@@ -75,7 +75,11 @@ Route::get('/adduser',function(){
 });
 
 //==========================Database Accessing Routes BELOW================================
-Route::get('/companylist','GetDatabase@index');
+Route::get('/companylist','GetDatabase@listOfCompanies');
+Route::get('/userlist','GetDatabase@listOfUsers');
+Route::get('/parameterlist','GetDatabase@listOfParameters');
+Route::get('/Allentitylist','GetDatabase@listOfCompanyWithHierarchy');
+Route::get('/datalist','GetDatabase@listOfData');
 
 //==================Mapping related routes BELOW [parameter & csvDataColumn mappings]=======
 Route::get('metermapping','MappingController@mappingIndexPage');

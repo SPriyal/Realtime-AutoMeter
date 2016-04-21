@@ -23,19 +23,18 @@
         </a>
       </li>
 
-      <li class="treeview">
+      <li class="treeview active">
         <a href="#">
           <i class="fa fa-table"></i> <span>Database</span>
           <i class="fa fa-angle-left pull-right"></i>
         </a>
         <ul class="treeview-menu">
           {{--show all companies with their respective ID--}}
-          <li><a href="/companylist"><i class="fa fa-circle-o"></i> Company List</a></li>
-          <li><a href="#"><i class="fa fa-circle-o"></i> Companies Table</a></li>
-          <li><a href="#"><i class="fa fa-circle-o"></i> Data</a></li>
-          <li><a href="#"><i class="fa fa-circle-o"></i> Parameters</a></li>
-          <li><a href="#"><i class="fa fa-circle-o"></i> Users</a></li>
-          <li><a href="#"><i class="fa fa-circle-o"></i> Change Password</a></li>
+          <li><a href="companylist"><i class="fa fa-circle-o"></i> Company List</a></li>
+          <li><a href="Allentitylist"><i class="fa fa-circle-o"></i> Companies Table</a></li>
+          <li><a href="parameterlist"><i class="fa fa-circle-o"></i> Parameters</a></li>
+          <li><a href="userlist"><i class="fa fa-circle-o"></i> Users</a></li>
+          <li><a href="datalist"><i class="fa fa-circle-o"></i> Data</a></li>
         </ul>
       </li>
 
