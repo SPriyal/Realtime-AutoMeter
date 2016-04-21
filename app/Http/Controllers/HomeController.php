@@ -64,7 +64,8 @@ class HomeController extends Controller
                 $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
                 return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
             } else {
-                echo "Invalid Association ID. Contact Administrator!";
+                return response(view('errors.401'),401);
+                //echo "Invalid Association ID. Contact Administrator!";
             }
         }
     }
@@ -94,10 +95,12 @@ class HomeController extends Controller
                 return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
             }
             else {
-                echo "Node Id not in the scope of user! Contact Administrator";
+                return response(view('errors.401'),401);
+               // echo "Node Id not in the scope of user! Contact Administrator";
             }
         } else{
-            echo "Invalid Association ID. Contact Administrator!";
+            return response(view('errors.401'),401);
+//            echo "Invalid Association ID. Contact Administrator!";
         }
     }
 //    =================================Index Page Related Code FINISH==============================================
