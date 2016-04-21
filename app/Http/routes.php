@@ -64,9 +64,9 @@ Route::get('/'.env('URL_ENTITY', 'auto').'/{c}/pdf', ['uses' =>'PDFController@PD
 
 //==========================New Company Insertion routes BELOW=============================
 Route::post('adminPanel/Process','NewCompanyController@processAdminPanelNewCompany');
-Route::get('/addcompany',function(){
+Route::get('/addcompany',['middleware' => 'admincheck',function(){
     return view('adminPanel.addCompany');
-});
+}]);
 
 //==========================New User Insertion routes BELOW================================
 Route::post('adminPanel/adduser','HomeController@AdminPanelNewUser');
