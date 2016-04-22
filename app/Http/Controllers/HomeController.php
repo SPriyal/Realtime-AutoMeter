@@ -251,7 +251,7 @@ public function AdminPanelNewUser(Request $request){
 //        $sql = Parameter::find(1)->dataDetails;
 //            echo "para id - ".$parameterIdOfCurrentNode;
 //        $parameterIdOfCurrentNode = $sql[0]['parameter_id'];
-        $parameterNameOfCurrentNode = Parameter::select('unit')->where('id','=',$parameterIdOfCurrentNode[0]['parameter_id'])->get();
+        $parameterNameOfCurrentNode = Parameter::select('id','unit')->where('id','=',$parameterIdOfCurrentNode[0]['parameter_id'])->get();
 //        echo json_decode($parameterNameOfCurrentNode);
 //        $finalResult = array_merge(json_decode($parameterNameOfCurrentNode),json_decode($sql));
         $final = ['parameter'=>$parameterNameOfCurrentNode,'data'=>$sql];
