@@ -8,7 +8,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,9 +20,7 @@ use App\parameterDetails;
 use App\Data as Data;
 use Carbon\Carbon;
 
-
 include(app_path() . '/Libraries/tcpdf/tcpdf.php');
-
 
 class MYPDF extends \TCPDF
 {
@@ -76,7 +73,6 @@ class MYPDF extends \TCPDF
         $this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . '        ' . 'Report Generation Time ' . date("d/m/y") . ' - ' . date("h:i:sa"), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }
-
 
 class PDFController extends Controller
 {
@@ -134,12 +130,27 @@ class PDFController extends Controller
                     ->get();
 //            echo $result;
                 if ($result->count() == 0) {
-                    echo "No Data Found for report";
-                    App::abort(404);
-//                echo "Array is empty ";
-                    $flag = 0;
+
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                        $pdf->SetFont('Times', '', 10);
+                        $pdf->Ln();
+                        $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+
                 } else {
-                    $flag = 1;
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
                     $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
 
@@ -163,13 +174,13 @@ class PDFController extends Controller
                         $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
                         $b++;
                     }
-                    $pdf->AddPage();
                 }
+                $pdf->AddPage();
             }
         }
 
 
-        if ($flag != 0){
+//        if ($flag != 0){
 
             $txt = <<<EOD
 ============Report Summary============
@@ -186,7 +197,7 @@ EOD;
 
             $pdf->Output();
 
-        }
+//        }
 
 
     }
@@ -243,12 +254,27 @@ EOD;
                     ->get();
 //            echo $result;
                 if ($result->count() == 0) {
-                    echo "No Data found for selected meters";
-                    App::abort(404);
-//                echo "Array is empty ";
-                    $flag = 0;
+
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $pdf->SetFont('Times', '', 10);
+                    $pdf->Ln();
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+
                 } else {
-                    $flag = 1;
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
                     $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
 
@@ -272,13 +298,13 @@ EOD;
                         $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
                         $b++;
                     }
-                    $pdf->AddPage();
                 }
+                $pdf->AddPage();
             }
         }
 
 
-        if ($flag != 0){
+//        if ($flag != 0){
 
             $txt = <<<EOD
 ============Report Summary============
@@ -295,7 +321,7 @@ EOD;
 
             $pdf->Output();
 
-        }
+//        }
 
 
     }
