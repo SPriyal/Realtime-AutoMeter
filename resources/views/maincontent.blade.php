@@ -110,7 +110,7 @@
                                 {{--<li><a href="/home?pname=water">Water Flow</a></li>--}}
                             {{--</ul>--}}
                         {{--</div>--}}
-                        <span>Current Reading: </span> <b id="currentReadingText"></b>
+                        <span id="currentReadingHeading"></span> <b id="currentReadingText"></b>
 						<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 						{{--<div class="btn-group">--}}
 							{{--<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>--}}
@@ -212,7 +212,8 @@
             if(parameterIdOfCurrentMeter == 1){
                 window.onload = currentReadingElements();
                 function currentReadingElements(){
-                        document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
+                    document.getElementById("currentReadingHeading").innerHTML = "Current Reading:";
+                    document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
                 }
                 var currValue = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
                 var currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
@@ -342,6 +343,10 @@
                                                 var minimumIndexLive = indexOfMin(arrayOfValuesOfCurrentMeter);
 
                                                 if(parameterIdOfCurrentMeter == 1){
+                                                    window.onload = currentReadingElements();
+                                                    function currentReadingElements(){
+                                                        document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
+                                                    }
                                                     currValue = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
                                                     currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                                                     maxValue = parseFloat(arrayOfValuesOfCurrentMeter[maximumIndexLive]);
