@@ -149,6 +149,8 @@ class PDFController extends Controller
                         $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
                         $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
                         $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                        $pdf->Ln();
+                        $pdf->Ln();
 
                 } else {
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
@@ -174,8 +176,10 @@ class PDFController extends Controller
                         $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
                         $b++;
                     }
+                    $pdf->Ln();
+                    $pdf->Ln();
+//                    $pdf->AddPage();
                 }
-                $pdf->AddPage();
             }
         }
 
@@ -273,6 +277,8 @@ EOD;
                     $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
                     $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
                     $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Ln();
+                    $pdf->Ln();
 
                 } else {
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
@@ -298,8 +304,10 @@ EOD;
                         $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
                         $b++;
                     }
+                    $pdf->Ln();
+                    $pdf->Ln();
+//                    $pdf->AddPage();
                 }
-                $pdf->AddPage();
             }
         }
 
