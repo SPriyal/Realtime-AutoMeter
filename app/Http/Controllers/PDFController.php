@@ -141,7 +141,7 @@ class PDFController extends Controller
                 } else {
                     $flag = 1;
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
-                    $result2 = parameterDetails::select('unit')->where('id', $result[0]['parameter_id'])->get();
+                    $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
 
 // print a block of text using Write()
                     $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
@@ -158,7 +158,7 @@ class PDFController extends Controller
                         $pdf->SetFont('Times', '', 10);
                         $pdf->Ln();
                         $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
-                        $pdf->Cell(35, 8, $result1['name'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $result2[0]['parameter_name'], 1, 0, 'C', 0, '', 3);
                         $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
                         $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
                         $b++;
@@ -250,7 +250,7 @@ EOD;
                 } else {
                     $flag = 1;
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
-                    $result2 = parameterDetails::select('unit')->where('id', $result[0]['parameter_id'])->get();
+                    $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
 
 // print a block of text using Write()
                     $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
@@ -267,7 +267,7 @@ EOD;
                         $pdf->SetFont('Times', '', 10);
                         $pdf->Ln();
                         $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
-                        $pdf->Cell(35, 8, $result1['name'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $result2[0]['parameter_name'], 1, 0, 'C', 0, '', 3);
                         $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
                         $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
                         $b++;
