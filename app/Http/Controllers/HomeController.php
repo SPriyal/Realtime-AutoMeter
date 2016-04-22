@@ -41,6 +41,7 @@ class HomeController extends Controller
 //    =================================Index Page Related Code BELOW==============================================
     public function index()
     {
+//        $value = Session::flush();  To clear all session values.
         $user = \Auth::user();
         $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
         if ($assocIdOfCurrentUser == 0) {
@@ -298,9 +299,19 @@ public function AdminPanelNewUser(Request $request){
             ->where('DateTime', '>', date('Y-m-d 08:00:00'))
             ->orderBy('DateTime','des')
             ->get();
+
         if ( $query->count() == 0) {
-                App::abort(404);
+//                App::abort(404);
 //            echo "Array is empty ";
+            date_default_timezone_set("Asia/Kolkata");
+            $html1 = '';
+            $html1 = $html1 . ' <tr>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . ' </tr>';
+            return $html1;
         }
         else {
             $value = Session::get('nodeID');
