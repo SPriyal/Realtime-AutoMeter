@@ -26,7 +26,7 @@
 				{{--<- Live data Here ->--}}
 				<!-- Small boxes (Stat box) -->
 				<div class="row">
-					<div class="col-lg-3 col-xs-6">
+					<div class="col-lg-3 col-xs-12 col-sm-6 ">
 						<!-- small box -->
 						<div class="small-box bg-aqua">
 							<div class="inner">
@@ -43,7 +43,7 @@
 							</div>
 						</div>
 					</div><!-- ./col -->
-					<div class="col-lg-3 col-xs-6">
+					<div class="col-lg-3 col-xs-12 col-sm-6">
 						<!-- small box -->
 						<div class="small-box bg-green">
 							<div class="inner">
@@ -59,7 +59,7 @@
 							</div>
 						</div>
 					</div><!-- ./col -->
-					<div class="col-lg-3 col-xs-6">
+					<div class="col-lg-3 col-xs-12 col-sm-6">
 						<!-- small box -->
 						<div class="small-box bg-yellow">
 							<div class="inner">
@@ -74,7 +74,7 @@
 							</div>
 						</div>
 					</div><!-- ./col -->
-					<div class="col-lg-3 col-xs-6">
+					<div class="col-lg-3 col-xs-12 col-sm-6">
 						<!-- small box -->
 						<div class="small-box bg-red">
 							<div class="inner">
@@ -99,29 +99,30 @@
 		<div class="col-md-12">
 			<div class="box">
 				<div class="box-header with-border">
-					<h3 class="box-title">Graphical Report</h3>
+					<h3 class="box-title">Graphics</h3>
 					<div class="box-tools pull-right">
-                        <div class="btn-group">
-                            <button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>
+                        {{--<div class="btn-group">--}}
+                            {{--<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>--}}
                             {{--<ul class="dropdown-menu" role="menu">--}}
                                 {{--<li><a href="/home?pname=power">Power</a></li>--}}
                                 {{--<li><a href="/home?pname=electricity">Electricity</a></li>--}}
                                 {{--<li><a href="/home?pname=production">Production</a></li>--}}
                                 {{--<li><a href="/home?pname=water">Water Flow</a></li>--}}
                             {{--</ul>--}}
-                        </div>
+                        {{--</div>--}}
+                        <span id="currentReadingHeading"></span> <b id="currentReadingText"></b>
 						<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-						<div class="btn-group">
-							<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>
-							<ul class="dropdown-menu" role="menu">
-								<li><a href="#">Last shift</a></li>
-								<li><a href="#">yesterday</a></li>
-								<li><a href="#">Previos month</a></li>
-								<li class="divider"></li>
-								<li><a href="#">Custom date</a></li>
-							</ul>
-						</div>
-						<button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+						{{--<div class="btn-group">--}}
+							{{--<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>--}}
+							{{--<ul class="dropdown-menu" role="menu">--}}
+								{{--<li><a href="#">Last shift</a></li>--}}
+								{{--<li><a href="#">yesterday</a></li>--}}
+								{{--<li><a href="#">Previos month</a></li>--}}
+								{{--<li class="divider"></li>--}}
+								{{--<li><a href="#">Custom date</a></li>--}}
+							{{--</ul>--}}
+						{{--</div>--}}
+						{{--<button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>--}}
 					</div>
 				</div><!-- /.box-header -->
 				<div class="box-body">
@@ -175,35 +176,67 @@
 //			console.log("Feedback[0] is - "+feedback['a'][0].unit);
             var feedback = twoDimensionalFeedback['data'];
             var parameterOfCurrentMeter = twoDimensionalFeedback['parameter'][0].unit;
+            var parameterIdOfCurrentMeter = twoDimensionalFeedback['parameter'][0].id;
 //            console.log("parameeter is "+parameterOfCurrentMeter)
 			var feedbackLength = feedback.length;
 			datePreviouslyTaken = Date.createFromMysql(feedback[feedbackLength - 1].DateTime);
 //			console.log("Date - "+datePreviouslyTaken);
 			var arrayOfValuesOfCurrentMeter = new Array();
-
-			for($i=0;$i<feedbackLength;$i++){
-			    arrayOfValuesOfCurrentMeter.push(parseInt(feedback[$i].value));
+			var diffArrayForParameterOne = new Array();
+            if(parameterIdOfCurrentMeter == 1){
+                for($i=1;$i<feedbackLength;$i++){
+                    arrayOfValuesOfCurrentMeter.push(parseFloat(parseFloat(feedback[$i].value) - parseFloat(feedback[$i - 1].value)).toFixed(2));
+//                    document.writeln("<br/>array for str["+($i-1)+"] is " + arrayOfValuesOfCurrentMeter[$i-1]);
+                }
+            }
+            else{
+                for($i=0;$i<feedbackLength;$i++){
+                    arrayOfValuesOfCurrentMeter.push(parseFloat(feedback[$i].value));
+//                    document.writeln("<br/>array for spd is " + arrayOfValuesOfCurrentMeter[$i]);
+                }
 			}
 			var maximumIndexFromPrevious = indexOfMax(arrayOfValuesOfCurrentMeter);
 			var minimumIndexFromPrevious = indexOfMin(arrayOfValuesOfCurrentMeter);
             //Folowing is to initialize HTML elements with particular ids, so as to prevent error!
-            window.onload = settingElements();
-            function settingElements() {
-                document.getElementById("currentValue").innerHTML = parseInt(feedback[feedbackLength-1].value);
-                document.getElementById("currentValueDate").innerHTML = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
-                document.getElementById("maximumValue").innerHTML = parseInt(feedback[maximumIndexFromPrevious].value);
-                document.getElementById("maximumValueDate").innerHTML = "("+moment(feedback[maximumIndexFromPrevious].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
-                document.getElementById("minimumValue").innerHTML = parseInt(feedback[minimumIndexFromPrevious].value);
-                document.getElementById("minimumValueDate").innerHTML = "("+moment(feedback[minimumIndexFromPrevious].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
-                document.getElementById("averageValue").innerHTML = averageOfArray(arrayOfValuesOfCurrentMeter);
-                document.getElementById("startTimeEndTime").innerHTML = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
-                document.getElementById("titleToGraph").innerHTML = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
+
+            window.onload = unitElements();
+            function unitElements(){
                 var allTilesParaUnits = document.getElementsByClassName("parameterUnit");
                 for($k=0;$k<allTilesParaUnits.length;$k++){
                     allTilesParaUnits[$k].innerHTML = parameterOfCurrentMeter;
                 }
             }
 
+
+
+            if(parameterIdOfCurrentMeter == 1){
+                window.onload = currentReadingElements();
+                function currentReadingElements(){
+                    document.getElementById("currentReadingHeading").innerHTML = "Current Reading:";
+                    document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
+                }
+                var currValue = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
+                var currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                var maxValue = parseFloat(arrayOfValuesOfCurrentMeter[maximumIndexFromPrevious]);
+                var maxValueDate = "("+moment(feedback[maximumIndexFromPrevious+1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                var minValue = parseFloat(arrayOfValuesOfCurrentMeter[minimumIndexFromPrevious]);
+                var minValueDate = "("+moment(feedback[minimumIndexFromPrevious+1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                var avgValue = averageOfArray(arrayOfValuesOfCurrentMeter);
+                var startTimeToEndTime = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
+                var titleOfGraph = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
+                displayElementById(currValue,currValueDate,maxValue,maxValueDate,minValue,minValueDate,avgValue,startTimeToEndTime,titleOfGraph);
+            }else{
+                currValue = parseFloat(feedback[feedbackLength-1].value);
+                currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                maxValue = parseFloat(feedback[maximumIndexFromPrevious].value);
+                maxValueDate = "("+moment(feedback[maximumIndexFromPrevious].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                minValue = parseFloat(feedback[minimumIndexFromPrevious].value);
+                minValueDate = "("+moment(feedback[minimumIndexFromPrevious].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                avgValue = averageOfArray(arrayOfValuesOfCurrentMeter);
+                startTimeToEndTime = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
+                titleOfGraph = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
+                displayElementById(currValue,currValueDate,maxValue,maxValueDate,minValue,minValueDate,avgValue,startTimeToEndTime,titleOfGraph);
+            }
 
 
 //            document.writeln("<br/>data is <br/>"+feedback[0].DateTime);
@@ -264,11 +297,11 @@
 										//Folowing is to initialize HTML elements with particular ids, so as to prevent error!
 										window.onload = settingElements();
 										function settingElements() {
-											document.getElementById("kwh").innerHTML = parseInt(feedbackLive[graphJSONincrementer].kWH);
-											document.getElementById("ampere").innerHTML = parseInt(feedbackLive[graphJSONincrementer].ampere);
-											document.getElementById("degreeC").innerHTML = parseInt(feedbackLive[graphJSONincrementer].degreeC);
-											document.getElementById("bar").innerHTML = parseInt(feedbackLive[graphJSONincrementer].bar);
-											document.getElementById("kwhMoney").innerHTML = (parseInt(feedbackLive[graphJSONincrementer].kWH)*6.986).toFixed(2);
+											document.getElementById("kwh").innerHTML = parseFloat(feedbackLive[graphJSONincrementer].kWH);
+											document.getElementById("ampere").innerHTML = parseFloat(feedbackLive[graphJSONincrementer].ampere);
+											document.getElementById("degreeC").innerHTML = parseFloat(feedbackLive[graphJSONincrementer].degreeC);
+											document.getElementById("bar").innerHTML = parseFloat(feedbackLive[graphJSONincrementer].bar);
+											document.getElementById("kwhMoney").innerHTML = (parseFloat(feedbackLive[graphJSONincrementer].kWH)*6.986).toFixed(2);
 										}*/
 //										document.write("<br>feedback is " + feedbackLive[graphJSONincrementer].DateTime  );
 //										document.write("<br>feedback is " + feedbackLive[graphJSONincrementer].value  );
@@ -300,27 +333,48 @@
                                             if(feedback[feedback.length - 1].DateTime != feedbackLive[graphJSONincrementer].DateTime){
                                                 feedback.push(feedbackLive[graphJSONincrementer]);
     //                                            console.log("feedback[length] - "+feedback[feedback.length-1].DateTime);
-                                                arrayOfValuesOfCurrentMeter.push(parseInt(feedback[feedback.length-1].value));
+
+                                                if(parameterIdOfCurrentMeter == 1)
+                                                    arrayOfValuesOfCurrentMeter.push(parseFloat(parseFloat(feedback[feedback.length-1].value) -  parseFloat(feedback[feedback.length-2].value)).toFixed(2));
+                                                else
+                                                    arrayOfValuesOfCurrentMeter.push(parseFloat(feedback[feedback.length-1].value));
+
                                                 var maximumIndexLive = indexOfMax(arrayOfValuesOfCurrentMeter);
                                                 var minimumIndexLive = indexOfMin(arrayOfValuesOfCurrentMeter);
-    //
-                                                window.onload = settingElements();
-                                                function settingElements() {
-                                                    document.getElementById("currentValue").innerHTML = parseInt(feedback[feedback.length-1].value);
-                                                    document.getElementById("currentValueDate").innerHTML = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
-                                                    document.getElementById("maximumValue").innerHTML = parseInt(feedback[maximumIndexLive].value);
-                                                    document.getElementById("maximumValueDate").innerHTML = "("+moment(feedback[maximumIndexLive].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
-                                                    document.getElementById("minimumValue").innerHTML = parseInt(feedback[minimumIndexLive].value);
-                                                    document.getElementById("minimumValueDate").innerHTML = "("+moment(feedback[minimumIndexLive].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
-                                                    document.getElementById("averageValue").innerHTML = averageOfArray(arrayOfValuesOfCurrentMeter);
-                                                    document.getElementById("startTimeEndTime").innerHTML = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
-                                                    document.getElementById("titleToGraph").innerHTML = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
-                                    //                document.getElementById("averageValueDate").innerHTML = "("+feedback[0].DateTime+" to <br/>"+feedback[feedbackLength-1].DateTime+")";
-                                                }
 
-                                                var x = Number(Date.createFromMysql(feedbackLive[graphJSONincrementer].DateTime)), // current time
-                                                    y = Number(feedbackLive[graphJSONincrementer].value);
-                                                series.addPoint([x, y], true, true);
+                                                if(parameterIdOfCurrentMeter == 1){
+                                                    window.onload = currentReadingElements();
+                                                    function currentReadingElements(){
+                                                        document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
+                                                    }
+                                                    currValue = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
+                                                    currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                                                    maxValue = parseFloat(arrayOfValuesOfCurrentMeter[maximumIndexLive]);
+                                                    maxValueDate = "("+moment(feedback[maximumIndexLive+1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                                                    minValue = parseFloat(arrayOfValuesOfCurrentMeter[minimumIndexLive]);
+                                                    minValueDate = "("+moment(feedback[minimumIndexLive+1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                                                    avgValue = averageOfArray(arrayOfValuesOfCurrentMeter);
+                                                    startTimeToEndTime = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
+                                                    titleOfGraph = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
+                                                    displayElementById(currValue,currValueDate,maxValue,maxValueDate,minValue,minValueDate,avgValue,startTimeToEndTime,titleOfGraph);
+                                                    var x = Number(Date.createFromMysql(feedback[feedback.length - 1].DateTime)), // current time
+                                                        y = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
+                                                    series.addPoint([x, y], true, true);
+                                                }else{
+                                                    currValue = parseFloat(feedback[feedback.length-1].value);
+                                                    currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                                                    maxValue = parseFloat(feedback[maximumIndexLive].value);
+                                                    maxValueDate = "("+moment(feedback[maximumIndexLive].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                                                    minValue = parseFloat(feedback[minimumIndexLive].value);
+                                                    minValueDate = "("+moment(feedback[minimumIndexLive].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
+                                                    avgValue = averageOfArray(arrayOfValuesOfCurrentMeter);
+                                                    startTimeToEndTime = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
+                                                    titleOfGraph = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
+                                                    displayElementById(currValue,currValueDate,maxValue,maxValueDate,minValue,minValueDate,avgValue,startTimeToEndTime,titleOfGraph);
+                                                    var x = Number(Date.createFromMysql(feedbackLive[graphJSONincrementer].DateTime)), // current time
+                                                        y = Number(feedbackLive[graphJSONincrementer].value);
+                                                    series.addPoint([x, y], true, true);
+                                                }
 											}
 											graphJSONincrementer++;
 											datePreviouslyTaken = dateCurrentOne;
@@ -397,44 +451,51 @@
             /*=================Tiles Code... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]================
 						window.onload = settingElements(); //Sets Tile values to the latest recent value
 						function settingElements() {
-							document.getElementById("kwh").innerHTML = parseInt(feedback[feedbackLength - 1].kWH);
-							document.getElementById("ampere").innerHTML = parseInt(feedback[feedbackLength - 1].ampere);
-							document.getElementById("degreeC").innerHTML = parseInt(feedback[feedbackLength - 1].degreeC);
-							document.getElementById("bar").innerHTML = parseInt(feedback[feedbackLength - 1].bar);
-							document.getElementById("kwhMoney").innerHTML = (parseInt(feedback[feedbackLength - 1].kWH)*6.986).toFixed(2);
+							document.getElementById("kwh").innerHTML = parseFloat(feedback[feedbackLength - 1].kWH);
+							document.getElementById("ampere").innerHTML = parseFloat(feedback[feedbackLength - 1].ampere);
+							document.getElementById("degreeC").innerHTML = parseFloat(feedback[feedbackLength - 1].degreeC);
+							document.getElementById("bar").innerHTML = parseFloat(feedback[feedbackLength - 1].bar);
+							document.getElementById("kwhMoney").innerHTML = (parseFloat(feedback[feedbackLength - 1].kWH)*6.986).toFixed(2);
 						}
 						*/
 
-						var data = [], i;
+						var data = [], j;
 						//Pushes values/data to graph to display
-						for (i = -(feedbackLength-1),j=0; i <= 0 ; i += 1,j++) {
+						for (j=0; j<arrayOfValuesOfCurrentMeter.length ; j++) {
             /*==================Multiple Parameter code... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]==============
 							if(parameterName == "kWH") {
 								data.push([
 									Number(Date.createFromMysql(feedback[j].dateTime)),
-									parseInt(feedback[j].kWH)
+									parseFloat(feedback[j].kWH)
 								]);
 							} else if(parameterName == "ampere") {
 								data.push([
 									Number(Date.createFromMysql(feedback[j].dateTime)),
-									parseInt(feedback[j].ampere)
+									parseFloat(feedback[j].ampere)
 								]);
 							} else if(parameterName == "degreeC") {
 								data.push([
 									Number(Date.createFromMysql(feedback[j].dateTime)),
-									parseInt(feedback[j].degreeC)
+									parseFloat(feedback[j].degreeC)
 								]);
 							} else if(parameterName == "bar") {
 								data.push([
 									Number(Date.createFromMysql(feedback[j].dateTime)),
-									parseInt(feedback[j].bar)
+									parseFloat(feedback[j].bar)
 								]);
 							}
 							*/
-							data.push([
-                                Number(Date.createFromMysql(feedback[j].DateTime)),
-                                parseInt(feedback[j].value)
-                            ]);
+							if(parameterIdOfCurrentMeter == 1){
+                                data.push([
+                                    Number(Date.createFromMysql(feedback[j+1].DateTime)),
+                                    parseFloat(arrayOfValuesOfCurrentMeter[j])
+                                ]);
+							} else {
+                                data.push([
+                                    Number(Date.createFromMysql(feedback[j].DateTime)),
+                                    parseFloat(arrayOfValuesOfCurrentMeter[j])
+                                ]);
+                            }
 						}
 						return data;
 					}())
@@ -457,15 +518,16 @@
             if (arr.length === 0) {
                 return -1;
             }
-            var max = arr[0];
+            var max = parseFloat(arr[0]);
 //            console.log("start Max Value is "+max);
             var maxIndex = 0;
             for (var i = 1; i < arr.length; i++) {
-//                console.log("Current  "+max);
-                if (arr[i] > max) {
+//                console.log("arr["+i+"] - "+arr[i]);
+                if (parseFloat(arr[i]) >= parseFloat(max)) {
                     maxIndex = i;
-                    max = arr[i];
+                    max = parseFloat(arr[i]);
                 }
+//                console.log("Current  "+max);
 
             }
 //            console.log("end Max Value is at "+maxIndex + "and its value is "+arr[maxIndex]);
@@ -476,13 +538,13 @@
             if (arr.length === 0) {
                 return -1;
             }
-            var min = arr[0];
+            var min = parseFloat(arr[0]);
             var minIndex = 0;
 //            console.log("start Min Value is "+min);
             for (var i = 1; i < arr.length; i++) {
-                if (arr[i] < min) {
+                if (parseFloat(arr[i]) <= parseFloat(min)) {
                     minIndex = i;
-                    min = arr[i];
+                    min = parseFloat(arr[i]);
                 }
 
             }
@@ -490,20 +552,12 @@
             return minIndex;
         }
 
-//        function getAvg(arrayOfValues) {
-//          var result =  arrayOfValues.reduce(function (p, c) {
-//            return p + c;
-//          })/arrayOfValues.length;
-//          console.log("result of avg is "+result);
-//          return result;
-//        }
-
         function averageOfArray(arr){
             var i=0;
             var sum =0;
             for(i=0;i<arr.length;i++){
 //                console.log("<br/>:::::Array["+i+"] = "+arr[i]);
-                sum += parseInt(arr[i]);
+                sum += parseFloat(arr[i]);
             }
 //            console.log("Last Array element is "+arr[arr.length-1]);
 //            console.log("sum is "+sum);
@@ -517,6 +571,22 @@
             var timeString = d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
 //            console.log("Converted Time is" + timeString);
             return timeString;
+        }
+
+
+        function displayElementById(currentVal,currentValDate,maxVal,maxValDate,minVal,minValDate,avgVal,startTiEndTi,titleGraph){
+            window.onload = settingElements();
+            function settingElements() {
+                document.getElementById("currentValue").innerHTML = currentVal;
+                document.getElementById("currentValueDate").innerHTML = currentValDate;
+                document.getElementById("maximumValue").innerHTML = maxVal;
+                document.getElementById("maximumValueDate").innerHTML = maxValDate;
+                document.getElementById("minimumValue").innerHTML = minVal;
+                document.getElementById("minimumValueDate").innerHTML = minValDate;
+                document.getElementById("averageValue").innerHTML = avgVal;
+                document.getElementById("startTimeEndTime").innerHTML = startTiEndTi;
+                document.getElementById("titleToGraph").innerHTML = titleGraph;
+            }
         }
 
 	</script>
