@@ -94,7 +94,7 @@ function validateDate($date)
 }
 
 ob_end_clean();
-header("Location: csvParser.php");
+header("Location: csvParserv2.2Live.php");
 die();
 ob_end_flush();
 ?>

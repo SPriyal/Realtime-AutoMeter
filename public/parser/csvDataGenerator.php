@@ -16,8 +16,11 @@ $data = str_getcsv($lastLine);
 if(validateDate($data[0])) {
     echo "==============inside validator of date... data exists!<br/>";
     for ($i = 0,$j=5; $i < $noOfMeters; $i++,$j+=3) {
+        echo "<br/>str[$i] is $data[$j]";
         $totalValueInStr[$i] = $data[$j];
+        echo "<br/>rt[$i] is ".$data[$j+2];
         $totalValueInRt[$i] = $data[$j+2];
+        echo "<br/>spd[$i] is ".$data[$j+1];
         $totalValueInSpd[$i] = $data[$j+1];
         $randomNumberForRtIF[$i] = mt_rand(3, 20);
         $dateChangerCounter[$i] = 0;
@@ -87,5 +90,4 @@ function validateDate($date)
     $d = DateTime::createFromFormat('d/m/y', $date);
     return $d && $d->format('d/m/y') === $date;
 }
-
 ?>
