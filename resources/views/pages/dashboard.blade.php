@@ -14,8 +14,10 @@
     <link href="http://code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css" />
     <link href="{{ asset("/bower_components/admin-lte/dist/css/AdminLTE.min.css")}}" rel="stylesheet" type="text/css" />
     <!-- AdminLTE Skins. Apply the skin class to the body tag so the changes take effect. -->
-    <link href="{{ asset("/bower_components/admin-lte/dist/css/skins/_all-skins.min.css")}}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset("/bower_components/admin-lte/dist/css/skins/skin-blue.min.css")}}" rel="stylesheet" type="text/css" />
     <link href="{{ asset("/bower_components/admin-lte/plugins/datatables/dataTables.bootstrap.css") }}"/>
+    <link href="{{ asset("/bower_components/admin-lte/plugins/datepicker/datepicker3.css") }}" />
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -81,12 +83,34 @@
           <script src="{{ asset ("/js/momentJS/moment.js") }}"></script>
 
 
+          {{--For date picker --}}
+          <script src="{{ asset ("/bower_components/admin-lte/plugins/datepicker/bootstrap-datepicker.js") }}"></script>
+          <script>
+              $(function () {
+                    $('#datepicker').datepicker({
+                        autoclose: true
+                    });
+
+                    $('#myDropdown').on('hide.bs.dropdown', function () {
+                        return false;
+                    });
+              });
+              </script>
+
               <!-- DataTables -->
               <script src="{{ asset ("/bower_components/admin-lte/plugins/datatables/jquery.dataTables.min.js") }}"></script>
               <script src="{{ asset ("/bower_components/admin-lte/plugins/datatables/dataTables.bootstrap.min.js") }}"></script>
                     <script>
                         $(function () {
                             $("#example1").DataTable();
+                            $('#example2').DataTable({
+                                "paging": true,
+                                "lengthChange": false,
+                                "searching": false,
+                                "ordering": true,
+                                "info": true,
+                                "autoWidth": false
+                            });
                         });
                     </script>
               <!-- SlimScroll -->

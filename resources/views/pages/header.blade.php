@@ -2,7 +2,7 @@
 <header class="main-header">
 
   <!-- Logo -->
-  <a href="#" class="logo">
+  <a href="/home" class="logo">
     <!-- mini logo for sidebar mini 50x50 pixels -->
     <span class="logo-mini"><b>A</b>S</span>
     <!-- logo for regular state and mobile devices -->
@@ -18,10 +18,13 @@
     <!-- Navbar Right Menu -->
     <div class="navbar-custom-menu">
       <ul class="nav navbar-nav">
+
         <!-- Sample Link -->
-        <li> <a href="#" ><i class="fa fa-file-text"></i><span class="hidden-xs"> Link</span> </a> </li>
+                <li> <a href="#" ><i class="fa fa-file-text"></i><span class="hidden-xs"> Link</span> </a> </li>
+        {{--<li> <i class="fa fa-calendar"></i> <input type="text" class="form-control pull-right" id="datepicker">  </li>--}}
+
         <!-- Reports Menu -->
-        <li class="dropdown">
+        <li class="dropdown" id="myDropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-file-text"></i><span class="hidden-xs"> Reports</span> <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/pdf">Today</a></li>
@@ -29,13 +32,9 @@
             <li><a href="/LastHour">Last Hour </a></li>
             <li class="divider"></li>
             {{--<li><a href="#">Custom date</a></li>--}}
-            Custom date
-            <li><div class="input-group date">
-                                  <div class="input-group-addon">
-                                    <i class="fa fa-calendar"></i>
-                                  </div>
-                                  <input type="text" class="form-control pull-right" id="datepicker">
-                                </div> </li>
+            <li><a href="#">Custom Date</a></li>
+            {{--<li> Select Custom date </li>--}}
+            <li> <div class="input-group date"> <div class="input-group-addon"> <i class="fa fa-calendar"></i> </div> <input type="text" class="form-control pull-right" id="datepicker"> </div> </li>
           </ul>
         </li>
         <!-- User Account Menu -->
