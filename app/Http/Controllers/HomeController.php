@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Input;
 use Illuminate\Support\Facades\Session as Session;
 use DB;
+use App\parameterDetails;
 use App\parameterDetails as Parameter;
 use App\Data as Data;
 
@@ -40,6 +41,7 @@ class HomeController extends Controller
 //    =================================Index Page Related Code BELOW==============================================
     public function index()
     {
+//        $value = Session::flush();  To clear all session values.
         $user = \Auth::user();
         $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
         if ($assocIdOfCurrentUser == 0) {
@@ -294,17 +296,41 @@ public function AdminPanelNewUser(Request $request){
 //    =========================Table Generation Code BELOW======================================
     public function TableValue($meterIdFromHierarchy)
     {
-        $query = Data::select('parameter_id','value','DateTime')->where('meter_id',$meterIdFromHierarchy)->take(100)->get();
-        $html1 = '';
-        for($a = 0; $a<sizeof($query); $a++) {
+        $query = Data::select('id','parameter_id','value','DateTime')
+//            ->havingRaw('id%10 = 0')
+            ->where('meter_id',$meterIdFromHierarchy)
+            ->where('DateTime', '>', date('Y-m-d 08:00:00'))
+            ->orderBy('DateTime','des')
+            ->get();
+
+        if ( $query->count() == 0) {
+//                App::abort(404);
+//            echo "Array is empty ";
+            date_default_timezone_set("Asia/Kolkata");
+            $html1 = '';
             $html1 = $html1 . ' <tr>';
-            $html1 = $html1 . '<td>'. ($a+'1') .'</td>';
-            $html1 = $html1 . '<td>'. $query[$a]['parameter_name'] .'</td>';
-            $html1 = $html1 . '<td>'. $query[$a]['value'] .'</td>';
-            $html1 = $html1 . '<td>'. $query[$a]['DateTime'] .'</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
             $html1 = $html1 . ' </tr>';
+            return $html1;
         }
-        return $html1;
+        else {
+//            $value = Session::get('nodeID');
+//            $result1 = Company::select('name')->where('id', $value)->first();
+            $result2 = parameterDetails::select('parameter_name','unit')->where('id', $query[0]['parameter_id'])->get();
+            $html1 = '';
+            for ($a = 0; $a < sizeof($query); $a++) {
+                $html1 = $html1 . ' <tr>';
+                $html1 = $html1 . '<td>' . ($a + '1') . '</td>';
+                $html1 = $html1 . '<td>' . $result2[0]['parameter_name'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['value'] . ' ' . $result2[0]['unit'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['DateTime'] . '</td>';
+                $html1 = $html1 . ' </tr>';
+            }
+            return $html1;
+        }
     }
 //    =========================Table Generation Code FINISH======================================
 

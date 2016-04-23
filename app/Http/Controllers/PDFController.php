@@ -8,7 +8,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,9 +20,7 @@ use App\parameterDetails;
 use App\Data as Data;
 use Carbon\Carbon;
 
-
 include(app_path() . '/Libraries/tcpdf/tcpdf.php');
-
 
 class MYPDF extends \TCPDF
 {
@@ -32,19 +29,31 @@ class MYPDF extends \TCPDF
     public function Header()
     {
         $value = Session::get('nodeID');
-        $parent = Company::where('id',$value)->first()->getRoot();
-        $node = Company::where('id', $value)->first();
-        foreach ($node->getDescendantsAndSelf() as $descendant) {
-            $result = Company::where('id', $descendant->parent_id)->first();
+        if ( $value == NULL) {
+            echo "Select One meter on Homepage to generate report";
+            App::abort(404);
         }
+        else {
+            $parent = Company::where('id', $value)->first()->getRoot();
+            $node = Company::where('id', $value)->first();
+            foreach ($node->getDescendantsAndSelf() as $descendant) {
+                $result = Company::where('id', $descendant->parent_id)->first();
+            }
+            if ( $result->count() == 0) {
+                echo "No data found";
+                App::abort(404);
+            }
+            else {
 
-        // Logo
-        $image_file = K_PATH_IMAGES . 'logo_example.jpg';
-        $this->Image($image_file, 10, 10, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-        // Set font
-        $this->SetFont('helvetica', 'B', 20);
-        // Title
-        $this->Cell(0, 15, 'Report for ' . $result['name'] . ' of ' . $parent['name'], 0, false, 'C', 0, '', 3, false, 'M', 'M');
+                // Logo
+                $image_file = K_PATH_IMAGES . 'logo_example.jpg';
+                $this->Image($image_file, 10, 10, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+                // Set font
+                $this->SetFont('helvetica', 'B', 20);
+                // Title
+                $this->Cell(0, 15, 'Report for ' . $result['name'] . ' of ' . $parent['name'], 0, false, 'C', 0, '', 3, false, 'M', 'M');
+            }
+        }
 
     }
 
@@ -60,7 +69,6 @@ class MYPDF extends \TCPDF
         $this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . '        ' . 'Report Generation Time ' . date("d/m/y") . ' - ' . date("h:i:sa"), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }
-
 
 class PDFController extends Controller
 {
@@ -81,61 +89,321 @@ class PDFController extends Controller
 
 // Data fetching from database for table in pdf
         $value = Session::get('nodeID');
-        //echo $value;
-        $node = Company::where('id', $value)->first();
-        foreach ($node->getDescendantsAndSelf() as $descendant) {
-            $parentid = Company::where('id', $descendant->parent_id)->first();
+        if ( empty($value)) {
+            echo "Select One meter on Homepage to generate report";
+            App::abort(404);
         }
-        $i = 0;
-        foreach ($parentid->getDescendants() as $siblings) {
-            $SiblingsID[$i] = $siblings['id'];
-            $i++;
-        }
+        else {
+            $node = Company::where('id', $value)->first();
+            foreach ($node->getDescendantsAndSelf() as $descendant) {
+                $parentid = Company::where('id', $descendant->parent_id)->first();
+            }
+            $i = 0;
+            foreach ($parentid->getDescendants() as $siblings) {
+                $SiblingsID[$i] = $siblings['id'];
+                $i++;
+            }
 
-        $pdf->AddPage();
 
-        $TestStartCall = $this->TimeCheck($value);
-        $TestEnd = date("Y-m-d h:i:s");
+            $pdf->AddPage();
 
-        for ($a = 0; $a < sizeof($SiblingsID); $a++) {
+            $TestStartCall = $this->TimeCheck($value);
+            $TestEnd = date("Y-m-d G:i:s");
 
-            $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
-            $result = Data::select('id','parameter_id', 'value', 'DateTime')
-                ->havingRaw('id%60 = 0')
-                ->where('meter_id', $SiblingsID[$a])
-                ->where('DateTime', '>', $TestStartCall)
-                ->where('DateTime', '<', $TestEnd)
-                ->get();
-            $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
-            $result2 = parameterDetails::select('unit')->where('id', $result[0]['parameter_id'])->get();
+            for ($a = 0; $a < sizeof($SiblingsID); $a++) {
+
+                $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
+                $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
+                    ->havingRaw('id%60 = 0')
+                    ->where('meter_id', $SiblingsID[$a])
+                    ->where('DateTime', '>', $TestStartCall)
+                    ->where('DateTime', '<', $TestEnd)
+                    ->get();
+                if ($result->count() == 0) {
+
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
 
 // print a block of text using Write()
-            $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                        $pdf->SetFont('Times', '', 10);
+                        $pdf->Ln();
+                        $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                        $pdf->Ln();
+                        $pdf->Ln();
+
+                } else {
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+                    $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $b = 1;
+                    foreach ($result as $row) {
+                        $pdf->SetFont('Times', '', 10);
+                        $pdf->Ln();
+                        $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $result2[0]['parameter_name'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
+                        $b++;
+                    }
+                    $pdf->Ln();
+                    $pdf->Ln();
+                }
+            }
+        }
+
+            $txt = <<<EOD
+============Report Summary============
+
+Report Start Time and Date: $TestStartCall
+Report  End  Time and Date: $TestEnd
+
+EOD;
+
+// print a block of text using Write()
             $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
-            $html = '<h2 align="center"><b> </b></h2>';
-            $pdf->writeHTML($html, true, false, true, false, '');
-            $pdf->SetFont('Times', '', 12);
-            foreach ($header as $heading) {
-                foreach ($heading as $column_heading)
-                    $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+
+            $pdf->Output();
+
+    }
+
+    public function PDFYesterday()
+    {
+
+        $pdf = new MYPDF();
+        //$pdf = new \TCPDF();
+
+// set margins for header and footer
+        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+// set auto page breaks
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+// Data fetching from database for table in pdf
+        $value = Session::get('nodeID');
+        if ( empty($value)) {
+            echo "Select One meter on Homepage to generate report";
+            App::abort(404);
+        }
+        else {
+            $node = Company::where('id', $value)->first();
+            foreach ($node->getDescendantsAndSelf() as $descendant) {
+                $parentid = Company::where('id', $descendant->parent_id)->first();
             }
-            $b = 1;
-            foreach ($result as $row) {
-                $pdf->SetFont('Times', '', 10);
-                $pdf->Ln();
-                $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
-                $pdf->Cell(35, 8, $result1['name'], 1, 0, 'C', 0, '', 3);
-                $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
-                $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
-                $b++;
+            $i = 0;
+            foreach ($parentid->getDescendants() as $siblings) {
+                $SiblingsID[$i] = $siblings['id'];
+                $i++;
             }
+
+
             $pdf->AddPage();
+
+            date_default_timezone_set('Asia/Kolkata');
+            $TestStartCall = date("Y-m-d 00:00:00", strtotime("-1 day"));
+            $TestEnd = date("Y-m-d 23:59:59", strtotime("-1 day"));
+
+            for ($a = 0; $a < sizeof($SiblingsID); $a++) {
+
+                $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
+                $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
+                    ->havingRaw('id%60 = 0')
+                    ->where('meter_id', $SiblingsID[$a])
+                    ->where('DateTime', '>', $TestStartCall)
+                    ->where('DateTime', '<', $TestEnd)
+                    ->get();
+                if ($result->count() == 0) {
+
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $pdf->SetFont('Times', '', 10);
+                    $pdf->Ln();
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Ln();
+                    $pdf->Ln();
+
+                } else {
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+                    $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $b = 1;
+                    foreach ($result as $row) {
+                        $pdf->SetFont('Times', '', 10);
+                        $pdf->Ln();
+                        $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $result2[0]['parameter_name'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
+                        $b++;
+                    }
+                    $pdf->Ln();
+                    $pdf->Ln();
+                }
+            }
+        }
+
+            $txt = <<<EOD
+============Report Summary============
+
+Report Start Time and Date: $TestStartCall
+Report  End  Time and Date: $TestEnd
+
+EOD;
+
+// print a block of text using Write()
+            $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+
+            $pdf->Output();
+
+    }
+
+    public function PDFLastHour()
+    {
+
+        $pdf = new MYPDF();
+        //$pdf = new \TCPDF();
+
+// set margins for header and footer
+        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+// set auto page breaks
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+// Data fetching from database for table in pdf
+        $value = Session::get('nodeID');
+        if ( empty($value)) {
+            echo "Select One meter on Homepage to generate report";
+            App::abort(404);
+        }
+        else {
+            $node = Company::where('id', $value)->first();
+            foreach ($node->getDescendantsAndSelf() as $descendant) {
+                $parentid = Company::where('id', $descendant->parent_id)->first();
+            }
+            $i = 0;
+            foreach ($parentid->getDescendants() as $siblings) {
+                $SiblingsID[$i] = $siblings['id'];
+                $i++;
+            }
+
+
+            $pdf->AddPage();
+
+            date_default_timezone_set('Asia/Kolkata');
+            $TestStartCall = date("Y-m-d G:i:s",strtotime("-1 hour"));
+            $TestEnd = date("Y-m-d G:i:s");
+
+            for ($a = 0; $a < sizeof($SiblingsID); $a++) {
+
+                $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
+                $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
+                    ->havingRaw('id%60 = 0')
+                    ->where('meter_id', $SiblingsID[$a])
+                    ->where('DateTime', '>', $TestStartCall)
+                    ->where('DateTime', '<', $TestEnd)
+                    ->get();
+                if ($result->count() == 0) {
+
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $pdf->SetFont('Times', '', 10);
+                    $pdf->Ln();
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Ln();
+                    $pdf->Ln();
+
+                } else {
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+                    $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $b = 1;
+                    foreach ($result as $row) {
+                        $pdf->SetFont('Times', '', 10);
+                        $pdf->Ln();
+                        $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $result2[0]['parameter_name'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
+                        $b++;
+                    }
+                    $pdf->Ln();
+                    $pdf->Ln();
+                }
+            }
         }
 
         $txt = <<<EOD
 ============Report Summary============
-
-
 
 Report Start Time and Date: $TestStartCall
 Report  End  Time and Date: $TestEnd
