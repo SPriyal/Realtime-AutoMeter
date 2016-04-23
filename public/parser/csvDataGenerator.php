@@ -10,12 +10,30 @@ $totalValueInRt = array();
 $randomNumberForRtIF = array();
 $dateChangerCounter = array();
 $totalValueInSpd = array();
-for($i=0;$i<$noOfMeters;$i++){
-    $totalValueInStr[$i]=mt_rand(2000,3000);
-    $totalValueInRt[$i]="0:00:00";
-    $totalValueInSpd[$i] = 16.0;
-    $randomNumberForRtIF[$i] = mt_rand(3,20);
-    $dateChangerCounter[$i] = 0;
+$fileHandler = file($file_name);
+$lastLine = $fileHandler[sizeof($fileHandler) - 1];
+$data = str_getcsv($lastLine);
+if(validateDate($data[0])) {
+    echo "==============inside validator of date... data exists!<br/>";
+    for ($i = 0,$j=5; $i < $noOfMeters; $i++,$j+=3) {
+        echo "<br/>str[$i] is $data[$j]";
+        $totalValueInStr[$i] = $data[$j];
+        echo "<br/>rt[$i] is ".$data[$j+2];
+        $totalValueInRt[$i] = $data[$j+2];
+        echo "<br/>spd[$i] is ".$data[$j+1];
+        $totalValueInSpd[$i] = $data[$j+1];
+        $randomNumberForRtIF[$i] = mt_rand(3, 20);
+        $dateChangerCounter[$i] = 0;
+    }
+}else{
+    echo "=============data doesnt exists!<br/>";
+    for ($i = 0; $i < $noOfMeters; $i++) {
+        $totalValueInStr[$i] = mt_rand(2000, 3000);
+        $totalValueInRt[$i] = "0:00:00";
+        $totalValueInSpd[$i] = 16.0;
+        $randomNumberForRtIF[$i] = mt_rand(3, 20);
+        $dateChangerCounter[$i] = 0;
+    }
 }
 
 while($f==0) {
@@ -67,4 +85,9 @@ function incrementTime($time,$incrementalFlag){
     return date('H:i:s',$newTime);
 }
 
+function validateDate($date)
+{
+    $d = DateTime::createFromFormat('d/m/y', $date);
+    return $d && $d->format('d/m/y') === $date;
+}
 ?>
