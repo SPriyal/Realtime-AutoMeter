@@ -334,6 +334,139 @@ EOD;
 
     }
 
+    public function PDFLastHour()
+    {
+
+        $pdf = new MYPDF();
+        //$pdf = new \TCPDF();
+
+// set margins for header and footer
+        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+// set auto page breaks
+        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+// Data fetching from database for table in pdf
+        $value = Session::get('nodeID');
+//        echo $value;
+//        var_dump($value);
+        if ( empty($value)) {
+            echo "Select One meter on Homepage to generate report";
+            App::abort(404);
+//                echo "Array is empty ";
+            $flag = 0;
+        }
+        else {
+            //echo $value;
+            $node = Company::where('id', $value)->first();
+            foreach ($node->getDescendantsAndSelf() as $descendant) {
+                $parentid = Company::where('id', $descendant->parent_id)->first();
+            }
+            $i = 0;
+            foreach ($parentid->getDescendants() as $siblings) {
+                $SiblingsID[$i] = $siblings['id'];
+                $i++;
+            }
+
+
+            $pdf->AddPage();
+
+            date_default_timezone_set('Asia/Kolkata');
+            $TestStartCall = date("Y-m-d G:i:s",strtotime("-1 hour"));
+//            echo $TestStartCall." ";
+            $TestEnd = date("Y-m-d G:i:s");
+//            echo $TestEnd;
+
+            for ($a = 0; $a < sizeof($SiblingsID); $a++) {
+
+                $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
+                $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
+                    ->havingRaw('id%60 = 0')
+                    ->where('meter_id', $SiblingsID[$a])
+                    ->where('DateTime', '>', $TestStartCall)
+                    ->where('DateTime', '<', $TestEnd)
+                    ->get();
+//            echo $result;
+                if ($result->count() == 0) {
+
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $pdf->SetFont('Times', '', 10);
+                    $pdf->Ln();
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found" , 1, 0, 'C', 0, '', 3);
+                    $pdf->Cell(35, 8, "No Data Found", 1, 0, 'C', 0, '', 3);
+                    $pdf->Ln();
+                    $pdf->Ln();
+
+                } else {
+                    $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
+                    $result2 = parameterDetails::select('parameter_name','unit')->where('id', $result[0]['parameter_id'])->get();
+
+// print a block of text using Write()
+                    $txt = 'Table of ' . $result1['name'] . $pdf->Ln();
+                    $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+                    $html = '<h2 align="center"><b> </b></h2>';
+                    $pdf->writeHTML($html, true, false, true, false, '');
+                    $pdf->SetFont('Times', '', 12);
+                    foreach ($header as $heading) {
+                        foreach ($heading as $column_heading)
+                            $pdf->Cell(35, 8, $column_heading, 1, 0, 'C', 0, '', 3);
+                    }
+                    $b = 1;
+                    foreach ($result as $row) {
+                        $pdf->SetFont('Times', '', 10);
+                        $pdf->Ln();
+                        $pdf->Cell(35, 8, $b, 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $result2[0]['parameter_name'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['value'] . ' ' . $result2[0]['unit'], 1, 0, 'C', 0, '', 3);
+                        $pdf->Cell(35, 8, $row['DateTime'], 1, 0, 'C', 0, '', 3);
+                        $b++;
+                    }
+                    $pdf->Ln();
+                    $pdf->Ln();
+//                    $pdf->AddPage();
+                }
+            }
+        }
+
+
+//        if ($flag != 0){
+
+        $txt = <<<EOD
+============Report Summary============
+
+
+
+Report Start Time and Date: $TestStartCall
+Report  End  Time and Date: $TestEnd
+
+EOD;
+
+// print a block of text using Write()
+        $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
+
+        $pdf->Output();
+
+//        }
+
+
+    }
+
+
     public function TimeCheck($nodeId)
     {
         date_default_timezone_set('Asia/Kolkata');

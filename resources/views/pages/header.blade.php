@@ -27,8 +27,16 @@
           <ul class="dropdown-menu" role="menu">
             <li><a href="/pdf">Today</a></li>
             <li><a href="/Yesterday">Yesterday </a></li>
+            <li><a href="/LastHour">Last Hour </a></li>
             <li class="divider"></li>
-            <li><a href="#">Custom date</a></li>
+            {{--<li><a href="#">Custom date</a></li>--}}
+            Custom date
+            <li><div class="input-group date">
+                                  <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                  </div>
+                                  <input type="text" class="form-control pull-right" id="datepicker">
+                                </div> </li>
           </ul>
         </li>
         <!-- User Account Menu -->
