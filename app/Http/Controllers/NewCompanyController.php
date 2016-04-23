@@ -14,7 +14,10 @@ use Illuminate\Http\Request;
 
 class NewCompanyController extends Controller {
 
-	//
+    public function __construct()
+    {
+        $this->middleware('admincheck');
+    }
 
     //    =============================New Company Insertion from CSV Parser Code BELOW==================================
     public function processAdminPanelNewCompany(Request $request){

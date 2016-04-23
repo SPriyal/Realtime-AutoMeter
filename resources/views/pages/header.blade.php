@@ -18,7 +18,6 @@
     <!-- Navbar Right Menu -->
     <div class="navbar-custom-menu">
       <ul class="nav navbar-nav">
-
         <!-- Sample Link -->
         <li> <a href="#" ><i class="fa fa-file-text"></i><span class="hidden-xs"> Link</span> </a> </li>
         <!-- Reports Menu -->

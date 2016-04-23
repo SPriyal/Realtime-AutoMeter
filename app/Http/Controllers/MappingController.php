@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class MappingController extends Controller {
 
+    public function __construct()
+    {
+        $this->middleware('admincheck');
+    }
+
 	public function mappingIndexPage(){
         $companyListFromDB = Company::select('name')->whereNull('parent_id')->get();
         $companyList = array();

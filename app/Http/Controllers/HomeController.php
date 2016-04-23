@@ -64,7 +64,8 @@ class HomeController extends Controller
                 $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
                 return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
             } else {
-                echo "Invalid Association ID. Contact Administrator!";
+                return response(view('errors.401'),401);
+                //echo "Invalid Association ID. Contact Administrator!";
             }
         }
     }
@@ -94,10 +95,12 @@ class HomeController extends Controller
                 return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
             }
             else {
-                echo "Node Id not in the scope of user! Contact Administrator";
+                return response(view('errors.401'),401);
+               // echo "Node Id not in the scope of user! Contact Administrator";
             }
         } else{
-            echo "Invalid Association ID. Contact Administrator!";
+            return response(view('errors.401'),401);
+//            echo "Invalid Association ID. Contact Administrator!";
         }
     }
 //    =================================Index Page Related Code FINISH==============================================
@@ -248,7 +251,7 @@ public function AdminPanelNewUser(Request $request){
 //        $sql = Parameter::find(1)->dataDetails;
 //            echo "para id - ".$parameterIdOfCurrentNode;
 //        $parameterIdOfCurrentNode = $sql[0]['parameter_id'];
-        $parameterNameOfCurrentNode = Parameter::select('unit')->where('id','=',$parameterIdOfCurrentNode[0]['parameter_id'])->get();
+        $parameterNameOfCurrentNode = Parameter::select('id','unit')->where('id','=',$parameterIdOfCurrentNode[0]['parameter_id'])->get();
 //        echo json_decode($parameterNameOfCurrentNode);
 //        $finalResult = array_merge(json_decode($parameterNameOfCurrentNode),json_decode($sql));
         $final = ['parameter'=>$parameterNameOfCurrentNode,'data'=>$sql];
