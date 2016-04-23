@@ -32,8 +32,6 @@ class MYPDF extends \TCPDF
         if ( $value == NULL) {
             echo "Select One meter on Homepage to generate report";
             App::abort(404);
-//                echo "Array is empty ";
-            $flag = 0;
         }
         else {
             $parent = Company::where('id', $value)->first()->getRoot();
@@ -44,8 +42,6 @@ class MYPDF extends \TCPDF
             if ( $result->count() == 0) {
                 echo "No data found";
                 App::abort(404);
-//                echo "Array is empty ";
-                $flag = 0;
             }
             else {
 
@@ -93,16 +89,11 @@ class PDFController extends Controller
 
 // Data fetching from database for table in pdf
         $value = Session::get('nodeID');
-//        echo $value;
-//        var_dump($value);
         if ( empty($value)) {
             echo "Select One meter on Homepage to generate report";
             App::abort(404);
-//                echo "Array is empty ";
-            $flag = 0;
         }
         else {
-            //echo $value;
             $node = Company::where('id', $value)->first();
             foreach ($node->getDescendantsAndSelf() as $descendant) {
                 $parentid = Company::where('id', $descendant->parent_id)->first();
@@ -128,7 +119,6 @@ class PDFController extends Controller
                     ->where('DateTime', '>', $TestStartCall)
                     ->where('DateTime', '<', $TestEnd)
                     ->get();
-//            echo $result;
                 if ($result->count() == 0) {
 
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
@@ -178,18 +168,12 @@ class PDFController extends Controller
                     }
                     $pdf->Ln();
                     $pdf->Ln();
-//                    $pdf->AddPage();
                 }
             }
         }
 
-
-//        if ($flag != 0){
-
             $txt = <<<EOD
 ============Report Summary============
-
-
 
 Report Start Time and Date: $TestStartCall
 Report  End  Time and Date: $TestEnd
@@ -200,9 +184,6 @@ EOD;
             $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
 
             $pdf->Output();
-
-//        }
-
 
     }
 
@@ -222,12 +203,9 @@ EOD;
 
 // Data fetching from database for table in pdf
         $value = Session::get('nodeID');
-        //echo $value;
         if ( empty($value)) {
             echo "Select One meter on Homepage to generate report";
             App::abort(404);
-//                echo "Array is empty ";
-            $flag = 0;
         }
         else {
             $node = Company::where('id', $value)->first();
@@ -256,7 +234,6 @@ EOD;
                     ->where('DateTime', '>', $TestStartCall)
                     ->where('DateTime', '<', $TestEnd)
                     ->get();
-//            echo $result;
                 if ($result->count() == 0) {
 
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
@@ -306,18 +283,12 @@ EOD;
                     }
                     $pdf->Ln();
                     $pdf->Ln();
-//                    $pdf->AddPage();
                 }
             }
         }
 
-
-//        if ($flag != 0){
-
             $txt = <<<EOD
 ============Report Summary============
-
-
 
 Report Start Time and Date: $TestStartCall
 Report  End  Time and Date: $TestEnd
@@ -328,9 +299,6 @@ EOD;
             $pdf->Write(0, $txt, '', 0, 'C', true, 0, false, false, 0);
 
             $pdf->Output();
-
-//        }
-
 
     }
 
@@ -350,16 +318,11 @@ EOD;
 
 // Data fetching from database for table in pdf
         $value = Session::get('nodeID');
-//        echo $value;
-//        var_dump($value);
         if ( empty($value)) {
             echo "Select One meter on Homepage to generate report";
             App::abort(404);
-//                echo "Array is empty ";
-            $flag = 0;
         }
         else {
-            //echo $value;
             $node = Company::where('id', $value)->first();
             foreach ($node->getDescendantsAndSelf() as $descendant) {
                 $parentid = Company::where('id', $descendant->parent_id)->first();
@@ -375,9 +338,7 @@ EOD;
 
             date_default_timezone_set('Asia/Kolkata');
             $TestStartCall = date("Y-m-d G:i:s",strtotime("-1 hour"));
-//            echo $TestStartCall." ";
             $TestEnd = date("Y-m-d G:i:s");
-//            echo $TestEnd;
 
             for ($a = 0; $a < sizeof($SiblingsID); $a++) {
 
@@ -388,7 +349,6 @@ EOD;
                     ->where('DateTime', '>', $TestStartCall)
                     ->where('DateTime', '<', $TestEnd)
                     ->get();
-//            echo $result;
                 if ($result->count() == 0) {
 
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
@@ -438,18 +398,12 @@ EOD;
                     }
                     $pdf->Ln();
                     $pdf->Ln();
-//                    $pdf->AddPage();
                 }
             }
         }
 
-
-//        if ($flag != 0){
-
         $txt = <<<EOD
 ============Report Summary============
-
-
 
 Report Start Time and Date: $TestStartCall
 Report  End  Time and Date: $TestEnd
@@ -461,11 +415,7 @@ EOD;
 
         $pdf->Output();
 
-//        }
-
-
     }
-
 
     public function TimeCheck($nodeId)
     {
