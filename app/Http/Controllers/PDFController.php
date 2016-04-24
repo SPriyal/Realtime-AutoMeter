@@ -344,7 +344,7 @@ EOD;
 
                 $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
                 $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
-                    ->havingRaw('id%60 = 0')
+//                    ->havingRaw('id%60 = 0')
                     ->where('meter_id', $SiblingsID[$a])
                     ->where('DateTime', '>', $TestStartCall)
                     ->where('DateTime', '<', $TestEnd)
