@@ -6,7 +6,7 @@
 
     <!-- Sidebar user panel -->
     <div class="user-panel">
-        <a href="home"><i class="fa fa-building fa-2x text-blue"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{$companyAndMeterNames[0]['companyName']}}</a>
+        <a href="#"><i class="fa fa-building fa-2x text-blue"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{$companyAndMeterNames[0]['companyName']}}</a>
     </div>
 
 
