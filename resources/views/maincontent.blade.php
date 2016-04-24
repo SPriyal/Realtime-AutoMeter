@@ -333,7 +333,8 @@
 										//Following will check, if value is missed or not with the help of date... If missed then the page will be reloaded.
 										dateCurrentOne = Date.createFromMysql(feedbackLive[graphJSONincrementer].DateTime);
 										var subDate = dateCurrentOne - datePreviouslyTaken;
-										if(subDate <15500)  {
+//										if(subDate <15500)
+										{
                 /*====================MultiParameter Code.... requires changes as ported to table 'data' .... that's why commented for now [10-4-16]============
 
 											if(parameterName == "kWH") {
@@ -352,7 +353,8 @@
 											*/
 //											console.log("feedback[length] - "+feedback[feedbackLength-1].DateTime);
 //                                            feedback.push({"id":feedbackLive[graphJSONincrementer].id,"meter_id":feedbackLive[graphJSONincrementer].meter_id,"parameter_id":feedbackLive[graphJSONincrementer].parameter_id,"value":feedbackLive[graphJSONincrementer].value,"DateTime":feedbackLive[graphJSONincrementer].DateTime});
-                                            if(feedback[feedback.length - 1].DateTime != feedbackLive[graphJSONincrementer].DateTime){
+                                            if(feedback[feedback.length - 1].DateTime != feedbackLive[graphJSONincrementer].DateTime)
+                                            {
                                                 feedback.push(feedbackLive[graphJSONincrementer]);
     //                                            console.log("feedback[length] - "+feedback[feedback.length-1].DateTime);
 
@@ -414,8 +416,8 @@
 											graphJSONincrementer++;
 											datePreviouslyTaken = dateCurrentOne;
 										}
-										else
-											location.reload();
+//										else
+//											location.reload();
 									}
 								}}, 3000);
 						}
