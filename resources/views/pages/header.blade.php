@@ -21,7 +21,7 @@
         <!-- Sample Link -->
         {{--<li> <a href="#" ><i class="fa fa-file-text"></i><span class="hidden-xs"> Link</span> </a> </li>--}}
         <!-- Reports Menu -->
-        <li class="dropdown">
+        <li class="dropdown" id="myDropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-file-text"></i><span class="hidden-xs"> Reports</span> <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="/pdf">Today</a></li>

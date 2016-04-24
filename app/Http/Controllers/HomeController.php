@@ -41,7 +41,7 @@ class HomeController extends Controller
 //    =================================Index Page Related Code BELOW==============================================
     public function index()
     {
-//        $value = Session::flush();  To clear all session values.
+        $value = Session::flush();  //To clear all session values.
         $user = \Auth::user();
         $assocIdOfCurrentUser = $user->asso_id; //Assoc id of current user
         if ($assocIdOfCurrentUser == 0) {
