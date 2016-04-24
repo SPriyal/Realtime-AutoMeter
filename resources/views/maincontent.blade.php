@@ -16,7 +16,7 @@
 
 		<div class="box box-default">
 			<div class="box-header with-border">
-				<h3 class="box-title">Overall Statistics</h3>
+				<h3 class="box-title">Overall Statistics<i class="analysisType"></i></h3>
 
 				<div class="box-tools pull-right">
 					<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
@@ -99,7 +99,7 @@
 		<div class="col-md-12">
 			<div class="box">
 				<div class="box-header with-border">
-					<h3 class="box-title">Graphics</h3>
+					<h3 class="box-title">Graphics <i class="analysisType"></i></h3>
 					<div class="box-tools pull-right">
                         {{--<div class="btn-group">--}}
                             {{--<button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>--}}
@@ -183,12 +183,31 @@
 //			console.log("Date - "+datePreviouslyTaken);
 			var arrayOfValuesOfCurrentMeter = new Array();
 			var diffArrayForParameterOne = new Array();
+//			alert("60".toHHMMSS());
             if(parameterIdOfCurrentMeter == 1){
                 for($i=1;$i<feedbackLength;$i++){
                     arrayOfValuesOfCurrentMeter.push(parseFloat(parseFloat(feedback[$i].value) - parseFloat(feedback[$i - 1].value)).toFixed(2));
 //                    document.writeln("<br/>array for str["+($i-1)+"] is " + arrayOfValuesOfCurrentMeter[$i-1]);
                 }
-            }
+                window.onload = currentReadingStrElements();
+                function currentReadingStrElements(){
+                    document.getElementById("currentReadingHeading").innerHTML = "Current Production:";
+                    document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
+                }
+            } else if(parameterIdOfCurrentMeter == 3){
+                for($i=1;$i<feedbackLength;$i++){
+                    var dateA = moment(feedback[$i].value,"HH:mm:ss");
+                    var dateB = moment(feedback[$i-1].value,"HH:mm:ss");
+                    var diffDate = dateA.diff(dateB,'seconds',true);
+                    arrayOfValuesOfCurrentMeter.push(diffDate);
+                    window.onload = currentReadingRtElements();
+                    function currentReadingRtElements(){
+                        document.getElementById("currentReadingHeading").innerHTML = "Current Run Time:";
+                        document.getElementById("currentReadingText").innerHTML = feedback[feedback.length - 1].value;
+                    }
+                }
+           }
+
             else{
                 for($i=0;$i<feedbackLength;$i++){
                     arrayOfValuesOfCurrentMeter.push(parseFloat(feedback[$i].value));
@@ -207,14 +226,17 @@
                 }
             }
 
-
-
-            if(parameterIdOfCurrentMeter == 1){
-                window.onload = currentReadingElements();
-                function currentReadingElements(){
-                    document.getElementById("currentReadingHeading").innerHTML = "Current Reading:";
-                    document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
+            if(parameterIdOfCurrentMeter == 1 || parameterIdOfCurrentMeter ==3 ){
+                window.onload = analysisTypeElements();
+                function analysisTypeElements(){
+                    var allTilesParaUnits = document.getElementsByClassName("analysisType");
+                    for($k=0;$k<allTilesParaUnits.length;$k++){
+                        allTilesParaUnits[$k].innerHTML = " (Each Minute Based Analysis)";
+                    }
                 }
+            }
+
+            if(parameterIdOfCurrentMeter == 1 || parameterIdOfCurrentMeter == 3){
                 var currValue = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
                 var currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                 var maxValue = parseFloat(arrayOfValuesOfCurrentMeter[maximumIndexFromPrevious]);
@@ -334,19 +356,31 @@
                                                 feedback.push(feedbackLive[graphJSONincrementer]);
     //                                            console.log("feedback[length] - "+feedback[feedback.length-1].DateTime);
 
-                                                if(parameterIdOfCurrentMeter == 1)
+                                                if(parameterIdOfCurrentMeter == 1){
                                                     arrayOfValuesOfCurrentMeter.push(parseFloat(parseFloat(feedback[feedback.length-1].value) -  parseFloat(feedback[feedback.length-2].value)).toFixed(2));
+                                                    window.onload = currentReadingStrElements();
+                                                    function currentReadingStrElements(){
+                                                        document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
+                                                    }
+                                                }
+                                                else if(parameterIdOfCurrentMeter == 3){
+                                                    var dateA = moment(feedback[$i].value,"HH:mm:ss");
+                                                    var dateB = moment(feedback[$i-1].value,"HH:mm:ss");
+                                                    var diffDate = dateA.diff(dateB,'seconds',true);
+                                                    arrayOfValuesOfCurrentMeter.push(diffDate);
+                                                    window.onload = currentReadingRtElements();
+                                                    function currentReadingRtElements(){
+                                                        document.getElementById("currentReadingText").innerHTML = feedback[feedback.length - 1].value;
+                                                    }
+                                                }
                                                 else
                                                     arrayOfValuesOfCurrentMeter.push(parseFloat(feedback[feedback.length-1].value));
 
                                                 var maximumIndexLive = indexOfMax(arrayOfValuesOfCurrentMeter);
                                                 var minimumIndexLive = indexOfMin(arrayOfValuesOfCurrentMeter);
 
-                                                if(parameterIdOfCurrentMeter == 1){
-                                                    window.onload = currentReadingElements();
-                                                    function currentReadingElements(){
-                                                        document.getElementById("currentReadingText").innerHTML = parseFloat(feedback[feedback.length - 1].value).toFixed(2);
-                                                    }
+                                                if(parameterIdOfCurrentMeter == 1 || parameterIdOfCurrentMeter == 3){
+
                                                     currValue = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
                                                     currValueDate = "(" +moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss")+")";
                                                     maxValue = parseFloat(arrayOfValuesOfCurrentMeter[maximumIndexLive]);
@@ -356,6 +390,7 @@
                                                     avgValue = averageOfArray(arrayOfValuesOfCurrentMeter);
                                                     startTimeToEndTime = "*<b><u>Start Time</u> - </b>"+moment(feedback[0].DateTime).format("ddd, MMM DD, HH:mm:ss")+"<b> &nbsp;&nbsp;<u>and Current Time</u> - </b>"+moment(feedback[feedback.length - 1].DateTime).format("ddd, MMM DD, HH:mm:ss") ;
                                                     titleOfGraph = moment(feedback[0].DateTime).format("dddd, MMM DD, HH:mm:ss") + "&nbsp; to &nbsp;" + moment(feedback[feedback.length - 1].DateTime).format("dddd, MMM DD, HH:mm:ss") ;
+//                                                    console.log("current Value is "+currValue);
                                                     displayElementById(currValue,currValueDate,maxValue,maxValueDate,minValue,minValueDate,avgValue,startTimeToEndTime,titleOfGraph);
                                                     var x = Number(Date.createFromMysql(feedback[feedback.length - 1].DateTime)), // current time
                                                         y = parseFloat(arrayOfValuesOfCurrentMeter[arrayOfValuesOfCurrentMeter.length - 1]);
@@ -425,7 +460,19 @@
 				title : {
 					text : ''
 				},
-
+//                yAxis: {
+//                    type: 'datetime',
+//                    dateTimeLabelFormats: {
+//                        second: '%H:%M:%S',
+//                        minute: '%H:%M',
+//                        hour: '%H:%M',
+//                        day: '%e. %b',
+//                        week: '%e. %b',
+//                        month: '%b \'%y',
+//                        year: '%Y'
+//                    }
+//                },
+//
                 navigation: {
                     buttonOptions: {
 
@@ -485,7 +532,7 @@
 								]);
 							}
 							*/
-							if(parameterIdOfCurrentMeter == 1){
+							if(parameterIdOfCurrentMeter == 1 || parameterIdOfCurrentMeter == 3){
                                 data.push([
                                     Number(Date.createFromMysql(feedback[j+1].DateTime)),
                                     parseFloat(arrayOfValuesOfCurrentMeter[j])
@@ -513,6 +560,18 @@
 			}
 			return null;
 		}
+		String.prototype.toHHMMSS = function () {
+            var sec_num = parseInt(this, 10); // don't forget the second param
+            var hours   = Math.floor(sec_num / 3600);
+            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+            var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+            if (hours   < 10) {hours   = "0"+hours;}
+            if (minutes < 10) {minutes = "0"+minutes;}
+            if (seconds < 10) {seconds = "0"+seconds;}
+            var time    = hours+':'+minutes+':'+seconds;
+            return time;
+        }
 
 		function indexOfMax(arr) {
             if (arr.length === 0) {
