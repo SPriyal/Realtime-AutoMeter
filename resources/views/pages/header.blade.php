@@ -22,7 +22,6 @@
         <!-- Sample Link -->
                 <li> <a href="#" ><i class="fa fa-file-text"></i><span class="hidden-xs"> Link</span> </a> </li>
         {{--<li> <i class="fa fa-calendar"></i> <input type="text" class="form-control pull-right" id="datepicker">  </li>--}}
-
         <!-- Reports Menu -->
         <li class="dropdown" id="myDropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-file-text"></i><span class="hidden-xs"> Reports</span> <span class="caret"></span></a>

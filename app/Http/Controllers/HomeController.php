@@ -114,10 +114,19 @@ class HomeController extends Controller
 public function AdminPanelNewUser(Request $request){
     $name = $request->get('inputName3');
     $email = $request->get('inputEmail3');
-    $password = bcrypt($request->get('inputPassword3'));
+    $pass = $request->get('inputPassword3');
+    $password = bcrypt($pass);
     $asso_id = $request->get('inputAsso3');
 
+    if($name == NULL || $email == NULL || $pass == NULL || $asso_id ==NULL ){
+        echo "Fields cannot be empty. Please go back. "; //TODO: Set Alert and Validation of inputs
+        return;
+    }
     $root = User::create(['name' => $name, 'email' => $email, 'password' => $password, 'asso_id' => $asso_id]);   //Creating node
+
+    if($root){
+        echo "User Added to Database!";
+    }
 }
 //    =============================New USER Insertion from form Finish==================================
 
