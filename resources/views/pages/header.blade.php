@@ -19,7 +19,7 @@
     <div class="navbar-custom-menu">
       <ul class="nav navbar-nav">
         <!-- Sample Link -->
-        <li> <a href="#" ><i class="fa fa-file-text"></i><span class="hidden-xs"> Link</span> </a> </li>
+        {{--<li> <a href="#" ><i class="fa fa-file-text"></i><span class="hidden-xs"> Link</span> </a> </li>--}}
         <!-- Reports Menu -->
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-file-text"></i><span class="hidden-xs"> Reports</span> <span class="caret"></span></a>
