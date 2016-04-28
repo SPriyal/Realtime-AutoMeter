@@ -15,9 +15,26 @@
      {{--</div>--}}
     <!-- /.search form -->
 
-    <div id="remote">
+    {{-- TODO -  ============Following code works well with AdminLTE searchBar & TypeAhead, only CSS is a problem... Even suggestions ar visible... Just their is some UI problem.. Please somebody solve it============= --}}
+{{--<form data-url="searchResult" method="get" class="sidebar-form">--}}
+    {{--<div id="remote" class="input-group" style="overflow: visible">--}}
+
+            {{--<input type="text" name="searchBox" id="inputSuccess" class="form-control typeahead" placeholder="Search..."/>--}}
+            {{--<span class="input-group-btn">--}}
+                {{--<button type='submit' name='search' id='search-btn' class="btn btn-flat"><i class="fa fa-search"></i></button>--}}
+            {{--</span>--}}
+
+        {{--{!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}--}}
+        {{--{!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg' )) !!}--}}
+        {{--{!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}--}}
+        {{--{!!Form::close()!!}--}}
+    {{--</div>--}}
+    {{--</form>--}}
+    {{--============================================AdminLTE Search with working TypeAhead Finish==========================--}}
+
+    <div id="remote" class="user-panel" style="overflow: visible">
         {!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}
-        {!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg' )) !!}
+        {!! Form::text('searchBox',null,array('placeholder' => 'Search Anything...','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg' )) !!}
         {{--{!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}--}}
         {!!Form::close()!!}
     </div>
