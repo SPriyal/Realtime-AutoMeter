@@ -15,6 +15,13 @@
      {{--</div>--}}
     <!-- /.search form -->
 
+    <div id="remote">
+        {!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}
+        {!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg' )) !!}
+        {{--{!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}--}}
+        {!!Form::close()!!}
+    </div>
+
     <!-- Sidebar Menu hierarchy-->
     <div><ul class="sidebar-menu"> {!! $html !!} </ul></div>
     <!-- /.sidebar-menu hierarchy-->

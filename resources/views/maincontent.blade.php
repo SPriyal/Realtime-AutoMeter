@@ -4,12 +4,12 @@
 
 		<div class=" pull-right">
 
-				<div id="remote">
-					{!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}
-					{!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg')) !!}
+				{{--<div id="remote">--}}
+					{{--{!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}--}}
+					{{--{!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg')) !!}--}}
 					{{--{!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}--}}
-					{!!Form::close()!!}
-				</div>
+					{{--{!!Form::close()!!}--}}
+				{{--</div>--}}
             </div>
 
 		<h4><b>{!!$breadcrumbs!!}</b></h4>
