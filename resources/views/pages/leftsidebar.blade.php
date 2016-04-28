@@ -32,8 +32,8 @@
     {{--</form>--}}
     {{--============================================AdminLTE Search with working TypeAhead Finish==========================--}}
 
-    <div id="remote" class="user-panel" style="overflow: visible">
-        {!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}
+    <div id="remote" style="overflow: visible">
+        {!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true,'class' => 'sidebar-form')) !!}
         {!! Form::text('searchBox',null,array('placeholder' => 'Search Anything...','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg' )) !!}
         {{--{!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}--}}
         {!!Form::close()!!}
