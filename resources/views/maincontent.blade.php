@@ -9,9 +9,10 @@
 					{!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg')) !!}
 					{{--{!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}--}}
 					{!!Form::close()!!}
-				</div></div>
+				</div>
+            </div>
 
-		<h3><b>{{$companyAndMeterNames[0]['companyName']}} >>> {{$companyAndMeterNames[0]['meterName']}}</b></h3>
+		<h4><b>{!!$breadcrumbs!!}</b></h4>
 
 
 		<div class="box box-default">
