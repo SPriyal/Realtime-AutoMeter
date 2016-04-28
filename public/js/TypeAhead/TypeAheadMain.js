@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
         displayKey: 'name',
         templates: {
             empty: [
-                '<div style="background: #3c8dbc; font-size: 18px;">'+ 'No Results'+ '</div>'
+                '<div style="background: #FFFFFF; font-size: 18px; color:#000000">'+ 'No Results'+ '</div>'
             ].join('\n'),
             suggestion: function(variable){
                 //var link = /l/public/e/"+variable.id;
