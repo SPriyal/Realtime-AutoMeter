@@ -62,9 +62,10 @@ class HomeController extends Controller
                 $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
                 $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser); //for Table
                 $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
+                $breadcrumbs ="";
                 $companyAndMeterNames = array();
                 $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
-                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames','breadcrumbs'));
             } else {
                 return response(view('errors.401'),401);
                 //echo "Invalid Association ID. Contact Administrator!";
@@ -92,9 +93,10 @@ class HomeController extends Controller
                 $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
                 $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
                 $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
+                $breadcrumbs = $this->getBreadCrumbs($objectOfNodeId);
                 $companyAndMeterNames = array();
                 $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
-                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames','breadcrumbs'));
             }
             else {
                 return response(view('errors.401'),401);
@@ -106,6 +108,35 @@ class HomeController extends Controller
         }
     }
 //    =================================Index Page Related Code FINISH==============================================
+
+
+
+//    =================================BreadCrumbs BELOW==============================================
+public function getBreadCrumbs($objectOfNodeId){
+    $ancestorsOfCurrentAssocId = $objectOfNodeId->getAncestorsAndSelf();
+    $breadcrumbs = "<ol class=\"breadcrumb\" style=\"background: none\">\n";
+    $i=0;
+    $lengthOfAncestorObject = count($ancestorsOfCurrentAssocId);
+    foreach($ancestorsOfCurrentAssocId as $ancestor){
+        $i++;
+        if($lengthOfAncestorObject == 1)
+            $breadcrumbs .= " <li class=\"active\"><p><span class='glyphicon glyphicon-home'></span></p></li>\n";
+        else {
+            if ($i == 1)
+                $breadcrumbs .= " <li><a href='/'><p><span class='glyphicon glyphicon-home'></span></p></a></li>\n";
+            else if ($i == $lengthOfAncestorObject)
+                $breadcrumbs .= " <li class=\"active\">" . $ancestor['name'] . "</li>\n";
+            else
+                $breadcrumbs .= " <li><a href='/" . env('URL_ENTITY', 'auto') . "/" . $ancestor['id'] . "'>" . $ancestor['name'] . "</a></li>\n";
+        }
+    }
+    $breadcrumbs .= "</ol>\n";
+    return $breadcrumbs;
+}
+//    =================================BreadCrumbs FINISH==============================================
+
+
+
 
 
 
