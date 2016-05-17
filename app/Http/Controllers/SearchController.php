@@ -51,7 +51,7 @@ class SearchController extends Controller {
     public function searchResult(Request $request){
         $selectedMeter = $request->get('searchBox');
         $idForSelectedMeter = Company::select('id')->where('name','=',$selectedMeter)->get();
-        return redirect()->action('HomeController@TableFromHierarchy',[$idForSelectedMeter[0]['id']]);
+        return redirect()->action('HomeController@indexForMeterFromHierarchy',[$idForSelectedMeter[0]['id']]);
     }
 
 }
