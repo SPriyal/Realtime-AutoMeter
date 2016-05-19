@@ -18,6 +18,7 @@ Route::get('home', 'HomeController@index');
 //==========================Testing purpose related routes BELOW===========================
 Route::get('/pV/{id}',['uses'=>'HomeController@PreviousValues']);       //Gives previously fetched values in JSON
 Route::get('random','HomeController@testing');
+Route::get('allData/{id}','HomeController@getPreviousTotalProductionAndDescendantData');
 //==========================Testing purpose related routes FINISH===========================
 
 

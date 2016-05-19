@@ -26,7 +26,11 @@
     <![endif]-->
       <script src="{{ asset ("/bower_components/admin-lte/plugins/jQuery/jQuery-2.1.4.min.js") }}"></script>
     		{{--<style type="text/css">${demo.css}</style>--}}
-      @yield('contentLiveGraphHead')
+      @if($typeOfIndex === "root")
+        @yield('ownerOrDepartmentalScriptHeader')
+      @else
+        @yield('contentLiveGraphHead')
+      @endif
 
 
   </head>
@@ -47,9 +51,16 @@
 
         <section class="content">
           <!-- Page Content -->
-          @yield('contentFourBox')
-          @yield('contentLiveGraph')
-          @yield('contentDataTable')
+          @if($typeOfIndex == "root")
+              @yield('ownerOrDepartmentalTiles')
+              @yield('ownerOrDepartmentalGraph')
+              @yield('ownerOrDepartmentalTable')
+          @else
+              @yield('contentFourBox')
+              @yield('contentLiveGraph')
+              @yield('contentDataTable')
+          @endif
+
         </section><!-- /.content -->
 
       </div><!-- /.content-wrapper -->
