@@ -9,6 +9,7 @@ use DB;
 use App\parameterDetails;
 use App\parameterDetails as Parameter;
 use App\Data as Data;
+use PhpParser\Node\Param;
 use Response;
 
 class HomeController extends Controller
@@ -97,7 +98,8 @@ class HomeController extends Controller
                 $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
                 $breadcrumbs = $this->getBreadCrumbs($objectOfNodeId);
                 $companyAndMeterNames = array('companyName'=>$companyNode->name);
-                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames','breadcrumbs'));
+                $typeOfIndex = $this->indexPageDecider($leafMeterObject);
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames','breadcrumbs','typeOfIndex'));
             }
             else {
                 return response(view('errors.401'),401);
@@ -343,18 +345,31 @@ class HomeController extends Controller
         foreach($descendantsBelowOneLevel as $descendant){
             $leavesOfDescendant = $descendant->getLeaves()->all();
             foreach($leavesOfDescendant as $leaf){
-                $data = Data::where('meter_id','=',$leaf->id)->where('parameter_id','=','1')->orderBy('DateTime', 'desc')->first();
+                $data = Data::where('meter_id','=',$leaf->id)->where('parameter_id','=','1')->orderBy('DateTime', 'desc')->first();                 // TODO - Parameter is hard coded in this whole section.... It will work on one primary parameter....
+                $parameterOfData = Parameter::where('id','=','1')->first();
                 if($data) {
                     $totalProduction += $data['value'];
                     $combinedData['totalProduction']['data'] = $totalProduction;
                     $combinedData['descendants'][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime'=>$data['DateTime']];
+                    $combinedData['totalProduction']['dateTime'] = $data['DateTime'];
                 }
             }
             $i++;
         }
-
-        return Response::json($combinedData);
+        $combinedData['totalDescendants']['value'] = sizeof($descendantsBelowOneLevel);
+        $combinedData['parameterUnit']['value'] = $parameterOfData['unit'];
+//        return json_encode($combinedData);
+        return $combinedData;
     }
+
+//    public function getDescendantTiles($nodeId){
+//        $productionData = $this->getPreviousTotalProductionAndDescendantData($nodeId);
+//        $pDarray = json_decode($productionData);
+////        echo $pDarray['totalProduction']['data'];
+//        print_r($pDarray);
+//        echo $productionData;
+//        var_dump($pDarray);
+//    }
 //    =============================ownerOrDepartmentalIndex Page Code FINISH==================================
 
 

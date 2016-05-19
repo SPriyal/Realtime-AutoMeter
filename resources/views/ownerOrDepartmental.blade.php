@@ -16,7 +16,10 @@
                 <!-- small box -->
                 <div class="small-box bg-aqua">
                     <div class="inner">
-                        <h3>---</h3>
+                        <h3>
+                            <b id="totalProduction">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+                            <p id="totalProductionDate">(Date Time)</p>
+                        </h3>
                         <p>Total Production</p>
                     </div>
                     <div class="icon">
@@ -30,7 +33,10 @@
                 <!-- small box -->
                 <div class="small-box bg-green">
                     <div class="inner">
-                        <h3>---<sup style="font-size: 20px">---</sup></h3>
+                        <h3>
+                            <b id="upTime">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+                            <p id="upTimeDate">(Date Time)</p>
+                        </h3>
 
                         <p>UpTime</p>
                     </div>
@@ -45,7 +51,10 @@
                 <!-- small box -->
                 <div class="small-box bg-yellow">
                     <div class="inner">
-                        <h3>---</h3>
+                        <h3>
+                            <b id="downTime">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+                            <p id="downTimeDate">(Date Time)</p>
+                        </h3>
 
                         <p>DownTime</p>
                     </div>
@@ -60,7 +69,10 @@
                     <!-- small box -->
                 <div class="small-box bg-red">
                     <div class="inner">
-                        <h3>---</h3>
+                        <h3>
+                            <b id="anythingElse">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+                            <p id="anythingElseDate">(Date Time)</p>
+                        </h3>
 
                         <p>Anything else</p>
                     </div>
@@ -70,6 +82,34 @@
                     <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
+        </div>
+        {{--<a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">--}}
+            {{--Productions from each departments--}}
+        {{--</a>--}}
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" style="float: right">
+            Productions from each departments
+        </button>
+        <br/><br/>
+        <div class="collapse" id="collapseExample">
+            <br/>
+            @foreach($productionData['descendants'] as $descendant)
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                                    <!-- small box -->
+                    <div class="small-box bg-light-blue-gradient">
+                        <div class="inner">
+                            <h3>
+                                <b id="{{$descendant['deptName']}}_{{$descendant['meter_name']}}" >---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+                                <p id="{{$descendant['deptName']}}_{{$descendant['meter_name']}}Date" >(Date Time)</p>
+                            </h3>
+                            <p>{{$descendant['deptName']}}</p>
+                        </div>
+                        {{--<div class="icon">--}}
+                            {{--<i class="ion ion-pie-graph"></i>--}}
+                        {{--</div>--}}
+                        <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div><!-- /.box-body -->
 </div><!-- /.box -->
@@ -146,6 +186,46 @@
 <script type="text/javascript">
     $(function () {
 
+//  =========================================Some Initial Code BELOW===========================================
+        var productionData = <?php echo json_encode($productionData); ?>;
+        var totalProduction = productionData['totalProduction'];
+        var descendants = productionData['descendants'];
+        var parameterUnit = productionData['parameterUnit'];
+        var i,j,k,l;
+//  =========================================Some Initial Code FINISH===========================================
+
+
+
+
+//  =========================================Tiles Initialization Code BELOW===========================================
+        window.onload = unitElements();
+        function unitElements(){
+            var allTilesParaUnits = document.getElementsByClassName("parameterUnit");
+            for($k=0;$k<allTilesParaUnits.length;$k++){
+                allTilesParaUnits[$k].innerHTML = parameterUnit.value;
+            }
+        }
+
+        var totalProductionValue = totalProduction.data;
+        console.log("totalProduction is "+totalProductionValue);
+        var totalProductionDateValue = totalProduction.dateTime;
+        totalProductionDateValue = "(" +moment(totalProductionDateValue).format("ddd, MMM DD, HH:mm:ss")+")";
+        displayMainTilesElementById(totalProductionValue,totalProductionDateValue);
+
+        for(i=0;i<descendants.length;i++){
+            var tileIdOfDescendants = descendants[i].deptName + "_"+descendants[i].meter_name;
+            var tileValueOfDescendants = descendants[i].value;
+            var tileDateIdOfDescendants = tileIdOfDescendants+"Date";
+            var tileDateValueOfDescendants = descendants[i].dateTime;
+            tileDateValueOfDescendants = "(" +moment(tileDateValueOfDescendants).format("ddd, MMM DD, HH:mm:ss")+")";
+            displayDescendantTilesElementById(tileIdOfDescendants,tileValueOfDescendants,tileDateIdOfDescendants,tileDateValueOfDescendants)
+        }
+
+//  =========================================Tiles Initialization Code FINISH===========================================
+
+
+
+//  =========================================Donut Chart Code BELOW===========================================
         $(document).ready(function () {
 
             // Build the chart
@@ -167,7 +247,7 @@
                         allowPointSelect: true,
                         cursor: 'pointer',
                         dataLabels: {
-                            enabled: false
+                            enabled: true
                         },
                         showInLegend: true
                     }
@@ -200,5 +280,29 @@
             });
         });
     });
+//  =========================================Donut Chart Code FINISH===========================================
+
+
+
+
+//  =========================================Some Other JS Functions BELOW===========================================
+    function displayMainTilesElementById(totalProductionValue,totalProductionDateValue){
+        setElementById("totalProduction",totalProductionValue);
+        setElementById("totalProductionDate",totalProductionDateValue);
+
+    }
+    function displayDescendantTilesElementById(tileId,tileValue,tileDateId,tileDateValue){
+        setElementById(tileId,tileValue);
+        setElementById(tileDateId,tileDateValue);
+    }
+
+    function setElementById(elementId,elementValue){
+        window.onload = settingElements();
+        function settingElements() {
+            document.getElementById(elementId).innerHTML = elementValue;
+        }
+    }
+
+//  =========================================Some Other JS Functions FINISH===========================================
 </script>
 @endsection

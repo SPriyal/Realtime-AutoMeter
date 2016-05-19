@@ -51,7 +51,7 @@
 
         <section class="content">
           <!-- Page Content -->
-          @if($typeOfIndex == "root")
+          @if($typeOfIndex === "root")
               @yield('ownerOrDepartmentalTiles')
               @yield('ownerOrDepartmentalGraph')
               @yield('ownerOrDepartmentalTable')
