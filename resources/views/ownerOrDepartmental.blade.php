@@ -92,7 +92,7 @@
         <br/><br/>
         <div class="collapse" id="collapseExample">
             <br/>
-            @foreach($productionData['descendants'] as $descendant)
+            @foreach($productionData['descendants'][\Carbon\Carbon::now()->format("Y-m-d")] as $descendant)
                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                                     <!-- small box -->
                     <div class="small-box bg-light-blue-gradient">
@@ -133,14 +133,14 @@
                 <div class="nav-tabs-custom">
                     <!-- Tabs within a box -->
                     <ul class="nav nav-tabs pull-right">
-                        <li><a href="#barChart" data-toggle="tab">Bar</a></li>
-                        <li class="active"><a href="#donutChart" data-toggle="tab">Donut</a></li>
+                        <li><a href="#donutChart" data-toggle="tab">Donut</a></li>
+                        <li class="active"><a href="#barChart" data-toggle="tab">Bar</a></li>
                         {{--<li class="pull-left header"><i class="fa fa-inbox"></i>Sales</li>--}}
                     </ul>
                     <div class="tab-content no-padding">
                         <!-- Morris chart - Sales -->
-                        <div class="chart tab-pane active" id="donutChart" style="height: 400px; min-width: 200px"></div>
-                        <div class="chart tab-pane" id="barChart" style="height: 400px; min-width: 200px"></div>
+                        <div class="chart tab-pane active" id="barChart" style=" height: 400px; min-width: 200px"></div>
+                        <div class="chart tab-pane" id="donutChart" style="height: 400px; min-width: 200px"></div>
                     </div>
                 </div>
                 {{--<div id="chartContainer" style="height: 500px; min-width: 200px">--}}
@@ -188,16 +188,27 @@
 
 //  =========================================Some Initial Code BELOW===========================================
         var productionData = <?php echo json_encode($productionData); ?>;
-        var totalProduction = productionData['totalProduction'];
-        var descendants = productionData['descendants'];
+        var date = moment().format("YYYY-MM-DD");
+        var totalProduction = productionData['totalProduction'][date];
+        var descendants = productionData['descendants'][date];
+        var descendantsAll = productionData['descendants'];
+        var totalProductionsAll = productionData['totalProduction'];
+//        console.log("length is "+ Object.keys(totalProductionsAll).length);
         var parameterUnit = productionData['parameterUnit'];
         var i,j,k,l;
+        var departmentProductionpercentage = Array();
+        for(i=0;i<descendants.length;i++){
+            var percentageOfDescendant = parseFloat(descendants[i].value) / parseFloat(totalProduction.data)*100;
+            departmentProductionpercentage.push({'deptName':descendants[i].deptName,'percentage':percentageOfDescendant});
+        }
+
 //  =========================================Some Initial Code FINISH===========================================
 
 
 
 
 //  =========================================Tiles Initialization Code BELOW===========================================
+//        --------------------initializing parameter unit elements---------------------
         window.onload = unitElements();
         function unitElements(){
             var allTilesParaUnits = document.getElementsByClassName("parameterUnit");
@@ -206,12 +217,13 @@
             }
         }
 
+//        --------------------setting totalProduction Tile to initial value---------------------
         var totalProductionValue = totalProduction.data;
-        console.log("totalProduction is "+totalProductionValue);
         var totalProductionDateValue = totalProduction.dateTime;
         totalProductionDateValue = "(" +moment(totalProductionDateValue).format("ddd, MMM DD, HH:mm:ss")+")";
         displayMainTilesElementById(totalProductionValue,totalProductionDateValue);
 
+//        --------------------initializing descendant tiles---------------------
         for(i=0;i<descendants.length;i++){
             var tileIdOfDescendants = descendants[i].deptName + "_"+descendants[i].meter_name;
             var tileValueOfDescendants = descendants[i].value;
@@ -225,22 +237,23 @@
 
 
 
-//  =========================================Donut Chart Code BELOW===========================================
+
         $(document).ready(function () {
 
+//  =========================================Donut Chart Code BELOW===========================================
             // Build the chart
             $('#donutChart').highcharts({
                 chart: {
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
-                    plotShadow: false,
+                    plotShadow: true,
                     type: 'pie'
                 },
                 title: {
-                    text: 'Browser market shares January, 2015 to May, 2015'
+                    text: 'Departmental Analysis'
                 },
                 tooltip: {
-                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    pointFormat: '{series.name}: <b>{point.percentage:.2f}% </b>'
                 },
                 plotOptions: {
                     pie: {
@@ -253,34 +266,126 @@
                     }
                 },
                 series: [{
-                    name: "Brands",
+                    name: "Departments",
                     colorByPoint: true,
-                    data: [{
-                        name: "Microsoft Internet Explorer",
-                        y: 56.33
-                    }, {
-                        name: "Chrome",
-                        y: 24.030000000000005,
-                        sliced: true,
-                        selected: true
-                    }, {
-                        name: "Firefox",
-                        y: 10.38
-                    }, {
-                        name: "Safari",
-                        y: 4.77
-                    }, {
-                        name: "Opera",
-                        y: 0.9100000000000001
-                    }, {
-                        name: "Proprietary or Undetectable",
-                        y: 0.2
-                    }]
+                    data: (function () {
+                        var data=[];
+                        for(j=0;j<departmentProductionpercentage.length;j++){
+                            data.push({'name': departmentProductionpercentage[j].deptName, 'y': departmentProductionpercentage[j].percentage});
+                        }
+                        return data;
+                    }())
                 }]
             });
         });
-    });
 //  =========================================Donut Chart Code FINISH===========================================
+
+
+    Highcharts.setOptions({
+        lang: {
+            drillUpText: 'Back'
+        }
+    });
+
+
+//  =========================================Bar Chart Code BELOW===========================================
+        // Create the chart
+        $('#barChart').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Last 7 days analysis'
+            },
+            subtitle: {
+                text: 'Click the columns to view departmental bar charts.'
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: 'Total Production'
+                }
+
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y:.1f}'+parameterUnit.value
+                    }
+                }
+            },
+
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}'+parameterUnit.value+'</b><br/>',
+                followPointer: true
+            },
+
+            series: [{
+                name: "Last 7 Days Analysis",
+                colorByPoint: true,
+                data:( function () {
+                     var data=[];
+                     var nameValue,yValue,drillDownValue;
+                     var lengthOftotalProductionsAll = Object.keys(totalProductionsAll).length;
+                     for(j=0;j<lengthOftotalProductionsAll;j++){
+                        nameValue =  moment(totalProductionsAll[moment().subtract(j,'days').format("YYYY-MM-DD")].dateTime).format("YYYY-MM-DD");
+                        yValue = parseFloat(totalProductionsAll[moment().subtract(j,'days').format("YYYY-MM-DD")].data);
+                        drillDownValue = nameValue;
+                        data.push({'name':nameValue, 'y':yValue, 'drilldown': drillDownValue});
+                     }
+                     return data;
+                }())
+            }],
+
+            drilldown: {
+                relativeTo: 'spacingBox',
+                position: {
+                    y: 0,
+                    x: 0
+                },
+                series:
+                (function () {
+                     var data=[];
+                     var seriesArr=[];
+                     var nameValue,idValue;
+                     var currentScanningDate;
+                     var lengthOfDescendantsAll = Object.keys(descendantsAll).length
+                     for(j=0;j<lengthOfDescendantsAll;j++){
+                        currentScanningDate = descendantsAll[moment().subtract(j,'days').format("YYYY-MM-DD")];
+                        nameValue =  moment(currentScanningDate[j].dateTime).format("YYYY-MM-DD");
+                        idValue = nameValue;
+                        for(k=0;k<currentScanningDate.length;k++){
+                            data.push([
+                                currentScanningDate[k].deptName,
+                                parseFloat(currentScanningDate[k].value)
+                            ]);
+                        }
+                        seriesArr.push({'name':nameValue, 'id':idValue, 'data': data});
+                        data = [];
+                     }
+                     return seriesArr;
+                }())
+            }
+        });
+    });
+//  =========================================Bar Chart Code FINISH===========================================
+
+
+
+
+
+
+
+
+
 
 
 

@@ -535,7 +535,7 @@
 									parseFloat(feedback[j].bar)
 								]);
 							}
-							*/
+    							*/
 							if(parameterIdOfCurrentMeter == 1 || parameterIdOfCurrentMeter == 3){
                                 data.push([
                                     Number(Date.createFromMysql(feedback[j+1].DateTime)),

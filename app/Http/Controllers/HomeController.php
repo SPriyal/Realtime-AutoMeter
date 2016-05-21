@@ -2,6 +2,7 @@
 
 use App\Company;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Input;
 use Illuminate\Support\Facades\Session as Session;
@@ -336,27 +337,40 @@ class HomeController extends Controller
 
 //    =============================ownerOrDepartmentalIndex Page Code BELOW==================================
     public function getPreviousTotalProductionAndDescendantData($nodeId) {
+        date_default_timezone_set('Asia/Kolkata');
         $objectOfCurrentNode = Company::where('id','=',$nodeId)->first();
         $descendantsBelowOneLevel = $objectOfCurrentNode->getDescendants(1);
         $totalProduction = 0;
         $combinedData = array();
-        $combinedData['totalProduction']['data'] = $totalProduction;
-        $i=0;
-        foreach($descendantsBelowOneLevel as $descendant){
-            $leavesOfDescendant = $descendant->getLeaves()->all();
-            foreach($leavesOfDescendant as $leaf){
-                $data = Data::where('meter_id','=',$leaf->id)->where('parameter_id','=','1')->orderBy('DateTime', 'desc')->first();                 // TODO - Parameter is hard coded in this whole section.... It will work on one primary parameter....
-                $parameterOfData = Parameter::where('id','=','1')->first();
-                if($data) {
-                    $totalProduction += $data['value'];
-                    $combinedData['totalProduction']['data'] = $totalProduction;
-                    $combinedData['descendants'][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime'=>$data['DateTime']];
-                    $combinedData['totalProduction']['dateTime'] = $data['DateTime'];
+        $totalDays = 7;
+//        $currentDate = Carbon::now();
+//        $currentDate->toDateString("Y-m-d");
+        $currentDate = date("2016-05-15");
+//        echo $currentDate;
+//        $combinedData['totalProduction'][$currentDate]['data'] = $totalProduction;
+        for($j=0;$j<7;$j++){
+            $i=0;
+            $dateTime ='';
+            foreach($descendantsBelowOneLevel as $descendant){
+                $leavesOfDescendant = $descendant->getLeaves()->all();
+                foreach($leavesOfDescendant as $leaf){
+                    $data = Data::whereDate('DateTime','=',Carbon::now()->subDays($j)->format("Y-m-d"))->where('meter_id','=',$leaf->id)->where('parameter_id','=','1')->orderBy('DateTime', 'desc')->first();
+                        // TODO - Parameter is hard coded in this whole section.... It will work on one primary parameter....
+                    $parameterOfData = Parameter::where('id','=','1')->first();
+                    if($data) {
+                        $totalProduction += $data['value'];
+                        $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = $totalProduction;
+                        $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime'=>$data['DateTime']];
+                        $dateTime = $data['DateTime'];
+                    }
                 }
+                $i++;
             }
-            $i++;
+            $totalProduction = 0;
+            $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = $dateTime;
+
         }
-        $combinedData['totalDescendants']['value'] = sizeof($descendantsBelowOneLevel);
+
         $combinedData['parameterUnit']['value'] = $parameterOfData['unit'];
 //        return json_encode($combinedData);
         return $combinedData;
