@@ -55,7 +55,7 @@ class HomeController extends Controller
             if ($objectOfAssocIdOfCurrentUser) {
                 $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
                 $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
-                $companyAndMeterNames = array('companyName'=>$companyNode->name);
+                $companyAndMeterNames = array('companyName'=>$companyNode->name, 'assocId'=> $assocIdOfCurrentUser);
                 $breadcrumbs ="";
                 if($objectOfAssocIdOfCurrentUser->isRoot()){
                     $typeOfIndex = $this->indexPageDecider($objectOfAssocIdOfCurrentUser);
@@ -342,39 +342,73 @@ class HomeController extends Controller
         $descendantsBelowOneLevel = $objectOfCurrentNode->getDescendants(1);
         $totalProduction = 0;
         $combinedData = array();
-        $totalDays = 7;
-//        $currentDate = Carbon::now();
-//        $currentDate->toDateString("Y-m-d");
-        $currentDate = date("2016-05-15");
-//        echo $currentDate;
-//        $combinedData['totalProduction'][$currentDate]['data'] = $totalProduction;
         for($j=0;$j<7;$j++){
             $i=0;
-            $dateTime ='';
             foreach($descendantsBelowOneLevel as $descendant){
                 $leavesOfDescendant = $descendant->getLeaves()->all();
                 foreach($leavesOfDescendant as $leaf){
-                    $data = Data::whereDate('DateTime','=',Carbon::now()->subDays($j)->format("Y-m-d"))->where('meter_id','=',$leaf->id)->where('parameter_id','=','1')->orderBy('DateTime', 'desc')->first();
+                    if($leaf->parameter_id == 1) {
+                        $data = Data::whereDate('DateTime', '=', Carbon::now()->subDays($j)->format("Y-m-d"))->where('meter_id', '=', $leaf->id)->orderBy('DateTime', 'desc')->first();
                         // TODO - Parameter is hard coded in this whole section.... It will work on one primary parameter....
-                    $parameterOfData = Parameter::where('id','=','1')->first();
-                    if($data) {
-                        $totalProduction += $data['value'];
-                        $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = $totalProduction;
-                        $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime'=>$data['DateTime']];
-                        $dateTime = $data['DateTime'];
+                        $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = 0;
+                        $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = Carbon::now()->subDays($j)->format("Y-m-d");
+                        $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => 0, 'dateTime' => Carbon::now()->subDays($j)->format("Y-m-d")];
+                        if ($data) {
+                            $totalProduction += $data['value'];
+                            $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = $totalProduction;
+                            $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime' => $data['DateTime']];
+                            $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = $data['DateTime'];
+                        }
                     }
                 }
                 $i++;
             }
             $totalProduction = 0;
-            $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = $dateTime;
-
         }
-
+        $parameterOfData = Parameter::where('id','=','1')->first();
         $combinedData['parameterUnit']['value'] = $parameterOfData['unit'];
 //        return json_encode($combinedData);
         return $combinedData;
     }
+    public function OwnerTableValue($meterIdFromHierarchy)
+    {
+        $query = Data::select('id','parameter_id','value','DateTime')
+//            ->havingRaw('id%10 = 0')
+            ->where('meter_id',$meterIdFromHierarchy)
+            ->where('DateTime', '>', date('Y-m-d 08:00:00'))
+            ->orderBy('DateTime','des')
+            ->get();
+
+        if ( $query->count() == 0) {
+//                App::abort(404);
+//            echo "Array is empty ";
+            date_default_timezone_set("Asia/Kolkata");
+            $html1 = '';
+            $html1 = $html1 . ' <tr>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . ' </tr>';
+            return $html1;
+        }
+        else {
+//            $value = Session::get('nodeID');
+//            $result1 = Company::select('name')->where('id', $value)->first();
+            $result2 = parameterDetails::select('parameter_name','unit')->where('id', $query[0]['parameter_id'])->get();
+            $html1 = '';
+            for ($a = 0; $a < sizeof($query); $a++) {
+                $html1 = $html1 . ' <tr>';
+                $html1 = $html1 . '<td>' . ($a + '1') . '</td>';
+                $html1 = $html1 . '<td>' . $result2[0]['parameter_name'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['value'] . ' ' . $result2[0]['unit'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['DateTime'] . '</td>';
+                $html1 = $html1 . ' </tr>';
+            }
+            return $html1;
+        }
+    }
+
 
 //    public function getDescendantTiles($nodeId){
 //        $productionData = $this->getPreviousTotalProductionAndDescendantData($nodeId);
@@ -384,6 +418,7 @@ class HomeController extends Controller
 //        echo $productionData;
 //        var_dump($pDarray);
 //    }
+
 //    =============================ownerOrDepartmentalIndex Page Code FINISH==================================
 
 
