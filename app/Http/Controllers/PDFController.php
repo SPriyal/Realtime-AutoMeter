@@ -38,6 +38,8 @@ class MYPDF extends \TCPDF
             $node = Company::where('id', $value)->first();
             foreach ($node->getDescendantsAndSelf() as $descendant) {
                 $result = Company::where('id', $descendant->parent_id)->first();
+//                echo $result;
+//                var_dump($result);
             }
             if ( $result->count() == 0) {
                 echo "No data found";
@@ -114,11 +116,15 @@ class PDFController extends Controller
 
                 $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
                 $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
-                    ->havingRaw('id%60 = 0')
+                    ->havingRaw('id%60 = 1')
                     ->where('meter_id', $SiblingsID[$a])
                     ->where('DateTime', '>', $TestStartCall)
                     ->where('DateTime', '<', $TestEnd)
                     ->get();
+
+//                echo $result;
+//                var_dump($result);
+
                 if ($result->count() == 0) {
 
                     $result1 = Company::select('name')->where('id', $SiblingsID[$a])->first();
@@ -229,7 +235,7 @@ EOD;
 
                 $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
                 $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
-                    ->havingRaw('id%60 = 0')
+                    ->havingRaw('id%60 = 1')
                     ->where('meter_id', $SiblingsID[$a])
                     ->where('DateTime', '>', $TestStartCall)
                     ->where('DateTime', '<', $TestEnd)
@@ -344,7 +350,7 @@ EOD;
 
                 $header = array(array('Number', 'Parameter Name', 'Value', 'Date And Time'));
                 $result = Data::select('id', 'parameter_id', 'value', 'DateTime')
-//                    ->havingRaw('id%60 = 0')
+//                    ->havingRaw('id%60 = 1')
                     ->where('meter_id', $SiblingsID[$a])
                     ->where('DateTime', '>', $TestStartCall)
                     ->where('DateTime', '<', $TestEnd)
