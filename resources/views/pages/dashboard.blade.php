@@ -16,6 +16,7 @@
     <!-- AdminLTE Skins. Apply the skin class to the body tag so the changes take effect. -->
     <link href="{{ asset("/bower_components/admin-lte/dist/css/skins/_all-skins.min.css")}}" rel="stylesheet" type="text/css" />
     <link href="{{ asset("/bower_components/admin-lte/plugins/datatables/dataTables.bootstrap.css") }}"/>
+    <link href="{{ asset("/bower_components/admin-lte/plugins/datepicker/datepicker3.css") }}" />
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -25,7 +26,11 @@
     <![endif]-->
       <script src="{{ asset ("/bower_components/admin-lte/plugins/jQuery/jQuery-2.1.4.min.js") }}"></script>
     		{{--<style type="text/css">${demo.css}</style>--}}
-      @yield('contentLiveGraphHead')
+      @if($typeOfIndex === "root")
+        @yield('ownerOrDepartmentalScriptHeader')
+      @else
+        @yield('contentLiveGraphHead')
+      @endif
 
 
   </head>
@@ -46,9 +51,16 @@
 
         <section class="content">
           <!-- Page Content -->
-          @yield('contentFourBox')
-          @yield('contentLiveGraph')
-          @yield('contentDataTable')
+          @if($typeOfIndex === "root")
+              @yield('ownerOrDepartmentalTiles')
+              @yield('ownerOrDepartmentalGraph')
+              @yield('ownerOrDepartmentalTable')
+          @else
+              @yield('contentFourBox')
+              @yield('contentLiveGraph')
+              @yield('contentDataTable')
+          @endif
+
         </section><!-- /.content -->
 
       </div><!-- /.content-wrapper -->
@@ -76,10 +88,25 @@
           {{--Following are the Scripts necessary for graph--}}
           <script src="{{ asset ("/js/highstock.js") }}"></script>
           <script src="{{ asset ("/js/exporting.js") }}"></script>
+          <script src="{{ asset ("js/otherHighStockJs/drilldown.js") }}"></script>
           <script src="{{ asset ("/js/TypeAhead/typeahead.bundle.js") }}"></script>
           <script src="{{ asset ("/js/TypeAhead/TypeAheadMain.js") }}"></script>
           <script src="{{ asset ("/js/momentJS/moment.js") }}"></script>
 
+
+          {{--For date picker --}}
+          <script src="{{ asset ("/bower_components/admin-lte/plugins/datepicker/bootstrap-datepicker.js") }}"></script>
+          <script>
+            $(function () {
+                $('#datepicker').datepicker({
+                    autoclose: true
+                });
+
+                $('#myDropdown').on('hide.bs.dropdown', function () {
+                    return false;
+                });
+            });
+          </script>
 
               <!-- DataTables -->
               <script src="{{ asset ("/bower_components/admin-lte/plugins/datatables/jquery.dataTables.min.js") }}"></script>

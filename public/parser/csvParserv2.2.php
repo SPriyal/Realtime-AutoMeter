@@ -4,7 +4,33 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 $noOfMeters= 8;
-$file_name = "multi_test.csv";
+
+
+//=================Downloading file from FTP Connection BELOW=========================
+$ftp_server = "ftp.milltech.in";
+$ftp_conn = ftp_connect($ftp_server, '21') or die("Could not connect to $ftp_server");
+$ftp_username = "Clients@milltech.in";
+$ftp_userpass = "clients123pwd";
+$login = ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
+$server_file = "AutoSoft/nrn28/stenter/".date("Ymd").".csv";
+$local_file = date("Ymd").".csv";
+$fp = fopen($local_file, "w");
+if (ftp_fget($ftp_conn, $fp, $server_file, FTP_ASCII, 0))
+{
+    echo "Successfully written to $local_file.";
+}
+else
+{
+    echo "Error downloading $server_file.";
+}
+//=================Downloading file from FTP Connection FINISH=========================
+
+
+
+
+
+
+$file_name = $local_file;
 $table_name = "data";
 $companyName = "N2P2 Pvt. Ltd.";
 $csvFilePath = $companyName."/";
@@ -74,7 +100,7 @@ for($i=0;$i<sizeof($fileHandler);$i++)
                                     $sql = mysqli_query($conn, "INSERT INTO `$table_name`(`meter_id`,`parameter_id`,`value`,`DateTime`) VALUES ('$idOfCurrentColumnMeter','$parameter_idOfCurrentMeter','$data[$currentColumnNo]','$dateTime')");
 //                                echo "<br/>";
 //                                echo "<br/>";
-//                                echo "Value inserted successfully!";
+                                    echo "Value inserted successfully!";
                                 }
                             }
                         }
@@ -93,6 +119,7 @@ function validateDate($date)
     return $d && $d->format('d/m/y') === $date;
 }
 
+ftp_close($ftp_conn);
 ob_end_clean();
 header("Location: csvParserv2.2Live.php");
 die();
