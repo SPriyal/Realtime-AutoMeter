@@ -32,7 +32,8 @@
 						<div class="small-box bg-aqua">
 							<div class="inner">
 								<h3>
-								    <b id="currentValue">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+								    <b id="currentValue">---</b>
+
 								    <p id="currentValueDate">(Date Time)</p>
                                 </h3>
 
@@ -534,7 +535,7 @@
 									parseFloat(feedback[j].bar)
 								]);
 							}
-							*/
+    							*/
 							if(parameterIdOfCurrentMeter == 1 || parameterIdOfCurrentMeter == 3){
                                 data.push([
                                     Number(Date.createFromMysql(feedback[j+1].DateTime)),
