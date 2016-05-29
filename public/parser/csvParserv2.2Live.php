@@ -4,7 +4,33 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 $noOfMeters= 8;
-$file_name = "multi_test.csv";
+
+
+
+//=================Downloading file from FTP Connection BELOW=========================
+$ftp_server = "ftp.milltech.in";
+$ftp_conn = ftp_connect($ftp_server, '21','5') or die("Could not connect to $ftp_server");
+$ftp_username = "Clients@milltech.in";
+$ftp_userpass = "clients123pwd";
+$login = ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
+$server_file = "AutoSoft/nrn28/stenter/".date("Ymd").".csv";
+$local_file = date("Ymd").".csv";
+$fp = fopen($local_file, "w");
+if (ftp_fget($ftp_conn, $fp, $server_file, FTP_ASCII, 0))
+{
+    echo "Successfully written to $local_file.";
+}
+else
+{
+    echo "Error downloading $server_file.";
+}
+//=================Downloading file from FTP Connection FINISH=========================
+
+
+
+
+
+$file_name = $local_file;
 $table_name = "data";
 $companyName = "N2P2 Pvt. Ltd.";
 $csvFilePath = $companyName."/";
@@ -89,7 +115,7 @@ function mainParser($conn,$fileHandler,$noOfTimesLoopRuns,$table_name,$csvFilePa
                                         echo "<br/>";
 //                                echo "<br/>";
 //                                echo "<br/>Value inserted successfully!";
-                                        echo "Value Inserted into DB --> DateTime - " . $dateTime . " Zone -  " . $zone . " din - " . $din . "  status - " . $status . " meterId - " . $idOfCurrentColumnMeter . " valueInserted - " . $valueOfCurrentColumnMeter;
+//                                        echo "Value Inserted into DB --> DateTime - " . $dateTime . " Zone -  " . $zone . " din - " . $din . "  status - " . $status . " meterId - " . $idOfCurrentColumnMeter . " valueInserted - " . $valueOfCurrentColumnMeter;
                                     }
                                 }
                             }
@@ -113,6 +139,7 @@ function validateDate($date)
 //header("Location: csvParser.php");
 //die();
 //ob_end_flush();
+ftp_close($ftp_conn);
 $url1 = $_SERVER['REQUEST_URI'];
-header("Refresh: 0.5; URL=$url1");
+header("Refresh: 7; URL=$url1");
 ?>
