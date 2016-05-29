@@ -29,11 +29,11 @@ jQuery(document).ready(function($) {
         displayKey: 'name',
         templates: {
             empty: [
-                '<div style="background: #3c8dbc; font-size: 18px;">'+ 'No Results'+ '</div>'
+                '<div style="background: #FFFFFF; font-size: 18px; color:#000000">'+ 'No Results'+ '</div>'
             ].join('\n'),
             suggestion: function(variable){
                 //var link = /l/public/e/"+variable.id;
-                return '<a href="/l/public/e/'+variable.id+'"><div style="background: #222d32; font-size: 18px;">'+'&nbsp&nbsp&nbsp&nbsp'+variable.name+'  ('+variable.id+')'+'&nbsp&nbsp&nbsp&nbsp'+'</div></a>'
+                return '<a href="/l/public/e/'+variable.id+'"><div style="background: #FFFFFF; font-size: 18px; color:#000000">'+'&nbsp&nbsp&nbsp&nbsp'+variable.name+'  ('+variable.id+')'+'&nbsp&nbsp&nbsp&nbsp'+'</div></a>'
                 //TODO - Hardcoded link above (URL_ENTITY)!
             }
         }

@@ -2,6 +2,7 @@
 
 use App\Company;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Input;
 use Illuminate\Support\Facades\Session as Session;
@@ -9,6 +10,8 @@ use DB;
 use App\parameterDetails;
 use App\parameterDetails as Parameter;
 use App\Data as Data;
+use PhpParser\Node\Param;
+use Response;
 
 class HomeController extends Controller
 {
@@ -50,27 +53,29 @@ class HomeController extends Controller
         } else{
             $objectOfAssocIdOfCurrentUser = Company::where('id', '=', $assocIdOfCurrentUser)->first();
             if ($objectOfAssocIdOfCurrentUser) {
-                if ($objectOfAssocIdOfCurrentUser->isLeaf()) {
-                    $idOfFirstLeafOfCurrentUser = $objectOfAssocIdOfCurrentUser['id'];
-                    $leafMeterObject = $objectOfAssocIdOfCurrentUser;
-                } else {
-                    $objectOfLeafIdOfCurrentUser = $objectOfAssocIdOfCurrentUser->getLeaves()->first();
-                    $idOfFirstLeafOfCurrentUser = $objectOfLeafIdOfCurrentUser['id'];
-                    $leafMeterObject = $objectOfLeafIdOfCurrentUser;
-                }
                 $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
-                $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
-                $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser); //for Table
                 $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
-                $companyAndMeterNames = array();
-                $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
-                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
+                $companyAndMeterNames = array('companyName'=>$companyNode->name, 'assocId'=> $assocIdOfCurrentUser);
+                $breadcrumbs ="";
+                if($objectOfAssocIdOfCurrentUser->isRoot()){
+                    $typeOfIndex = $this->indexPageDecider($objectOfAssocIdOfCurrentUser);
+                    $productionData = $this->getPreviousTotalProductionAndDescendantData($assocIdOfCurrentUser);
+                    $dataForTable = "";
+                    return view('ownerOrDepartmental',compact('html','companyAndMeterNames','typeOfIndex','productionData','dataForTable'));
+                }else {
+                    $idOfFirstLeafOfCurrentUser = $objectOfAssocIdOfCurrentUser['id'];
+                    $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
+                    $dataForTable = $this->TableValue($idOfFirstLeafOfCurrentUser); //for Table
+                    $typeOfIndex = $this->indexPageDecider($objectOfAssocIdOfCurrentUser);
+                    return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames','breadcrumbs','typeOfIndex'));
+                }
             } else {
                 return response(view('errors.401'),401);
                 //echo "Invalid Association ID. Contact Administrator!";
             }
         }
     }
+
     public function indexForMeterFromHierarchy($nodeId)
     {
         $user = \Auth::user();
@@ -92,9 +97,10 @@ class HomeController extends Controller
                 $html = $this->getHtmlForHierarchy($assocIdOfCurrentUser); //for left navigation
                 $dataForPreviousValues = $this->PreviousValues($idOfFirstLeafOfCurrentUser); //for live graph
                 $companyNode = $objectOfAssocIdOfCurrentUser->getRoot();
-                $companyAndMeterNames = array();
-                $companyAndMeterNames[] = ['companyName'=>$companyNode->name,'meterName'=>$leafMeterObject->name];
-                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames'));
+                $breadcrumbs = $this->getBreadCrumbs($objectOfNodeId);
+                $companyAndMeterNames = array('companyName'=>$companyNode->name);
+                $typeOfIndex = $this->indexPageDecider($leafMeterObject);
+                return view('maincontent', compact('html', 'dataForPreviousValues', 'dataForTable','companyAndMeterNames','breadcrumbs','typeOfIndex'));
             }
             else {
                 return response(view('errors.401'),401);
@@ -109,9 +115,61 @@ class HomeController extends Controller
 
 
 
+//    =================================BreadCrumbs BELOW==============================================
+    public function getBreadCrumbs($objectOfNodeId){
+    $ancestorsOfCurrentAssocId = $objectOfNodeId->getAncestorsAndSelf();
+    $breadcrumbs = "<ol class=\"breadcrumb\" style=\"background: none\">\n";
+    $i=0;
+    $lengthOfAncestorObject = count($ancestorsOfCurrentAssocId);
+    foreach($ancestorsOfCurrentAssocId as $ancestor){
+        $i++;
+        if($lengthOfAncestorObject == 1)
+            $breadcrumbs .= " <li class=\"active\"><p><span class='glyphicon glyphicon-home'></span></p></li>\n";
+        else {
+            if ($i == 1)
+                $breadcrumbs .= " <li><a href='/'><p><span class='glyphicon glyphicon-home'></span></p></a></li>\n";
+            else if ($i == $lengthOfAncestorObject)
+                $breadcrumbs .= " <li class=\"active\">" . $ancestor['name'] . "</li>\n";
+            else
+                $breadcrumbs .= " <li><a href='/" . env('URL_ENTITY', 'auto') . "/" . $ancestor['id'] . "'>" . $ancestor['name'] . "</a></li>\n";
+        }
+    }
+    $breadcrumbs .= "</ol>\n";
+    return $breadcrumbs;
+}
+//    =================================BreadCrumbs FINISH==============================================
+
+
+//    =================================Index Page Type Decider BELOW==============================================
+    public function indexPageDecider($objectOfNodeid){
+    if($objectOfNodeid->isLeaf()){
+        return "leaf";
+    }else if ($objectOfNodeid->isRoot()) {
+        return "root";
+    }else{
+//        $companyNode = $objectOfNodeid->getRoot();
+//        $heightOfCompany = $companyNode->getDescendants()->max('depth');
+//        $levelOfCurrentNode = $objectOfNodeid->getLevel();
+//        echo "minus 1 is : " . ($heightOfCompany - 1);
+        $levelOfCurrentNode = $objectOfNodeid->getLevel();
+//        $levelOfLeafOfCurrentNode = $objectOfNodeid->getLeaves()->getLevel();
+//        echo "current level is ". $levelOfCurrentNode . "and its leaf level is " . $levelOfLeafOfCurrentNode;
+//        $differenceInBothLevel = $levelOfLeafOfCurrentNode - $levelOfCurrentNode;
+//        if($differenceInBothLevel == 1){
+//            return "machinal";
+//        }else{
+//            return "departmental";
+//        }
+        return "other";
+    }
+
+}
+//    =================================Index Page Type Decider FINISH==============================================
+
+
 
 //    =============================New USER Insertion from form BELOW==================================
-public function AdminPanelNewUser(Request $request){
+    public function AdminPanelNewUser(Request $request){
     $name = $request->get('inputName3');
     $email = $request->get('inputEmail3');
     $pass = $request->get('inputPassword3');
@@ -220,7 +278,7 @@ public function AdminPanelNewUser(Request $request){
     public function LiveValues($nodeId)
     {
 //        echo "id from client is ".$nodeId;
-        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
+        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 45 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 45 SECOND)'))->get();
         return json_encode($query);
     }
     public function shiftCheck()
@@ -275,6 +333,96 @@ public function AdminPanelNewUser(Request $request){
 
     }
     // ----------------------- GRAPH CODE Finish------------------------------------------------
+
+
+//    =============================ownerOrDepartmentalIndex Page Code BELOW==================================
+    public function getPreviousTotalProductionAndDescendantData($nodeId) {
+        date_default_timezone_set('Asia/Kolkata');
+        $objectOfCurrentNode = Company::where('id','=',$nodeId)->first();
+        $descendantsBelowOneLevel = $objectOfCurrentNode->getDescendants(1);
+        $totalProduction = 0;
+        $combinedData = array();
+        for($j=0;$j<7;$j++){
+            $i=0;
+            foreach($descendantsBelowOneLevel as $descendant){
+                $leavesOfDescendant = $descendant->getLeaves()->all();
+                $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = 0;
+                $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = Carbon::now()->subDays($j)->format("Y-m-d");
+                $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'deptId' => $descendant['id'], 'value' => 0, 'dateTime' => Carbon::now()->subDays($j)->format("Y-m-d")];
+                foreach($leavesOfDescendant as $leaf){
+                    if($leaf->parameter_id == 1) {
+                        $data = Data::whereDate('DateTime', '=', Carbon::now()->subDays($j)->format("Y-m-d"))->where('meter_id', '=', $leaf->id)->orderBy('DateTime', 'desc')->first();
+                        // TODO - Parameter is hard coded in this whole section.... It will work on one primary parameter....
+                        $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = 0;
+                        $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = Carbon::now()->subDays($j)->format("Y-m-d");
+                        $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'deptId' => $descendant['id'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => 0, 'dateTime' => Carbon::now()->subDays($j)->format("Y-m-d")];
+                        if ($data) {
+                            $totalProduction += $data['value'];
+                            $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = $totalProduction;
+                            $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'deptId' => $descendant['id'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime' => $data['DateTime']];
+                            $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = $data['DateTime'];
+                        }
+                    }
+                }
+                $i++;
+            }
+            $totalProduction = 0;
+        }
+        $parameterOfData = Parameter::where('id','=','1')->first();
+        $combinedData['parameterUnit']['value'] = $parameterOfData['unit'];
+//        return json_encode($combinedData);
+        return $combinedData;
+    }
+    public function OwnerTableValue($meterIdFromHierarchy)
+    {
+        $query = Data::select('id','parameter_id','value','DateTime')
+//            ->havingRaw('id%10 = 0')
+            ->where('meter_id',$meterIdFromHierarchy)
+            ->where('DateTime', '>', date('Y-m-d 08:00:00'))
+            ->orderBy('DateTime','des')
+            ->get();
+
+        if ( $query->count() == 0) {
+//                App::abort(404);
+//            echo "Array is empty ";
+            date_default_timezone_set("Asia/Kolkata");
+            $html1 = '';
+            $html1 = $html1 . ' <tr>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . '<td>' . ('No Data Found') . '</td>';
+            $html1 = $html1 . ' </tr>';
+            return $html1;
+        }
+        else {
+//            $value = Session::get('nodeID');
+//            $result1 = Company::select('name')->where('id', $value)->first();
+            $result2 = parameterDetails::select('parameter_name','unit')->where('id', $query[0]['parameter_id'])->get();
+            $html1 = '';
+            for ($a = 0; $a < sizeof($query); $a++) {
+                $html1 = $html1 . ' <tr>';
+                $html1 = $html1 . '<td>' . ($a + '1') . '</td>';
+                $html1 = $html1 . '<td>' . $result2[0]['parameter_name'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['value'] . ' ' . $result2[0]['unit'] . '</td>';
+                $html1 = $html1 . '<td>' . $query[$a]['DateTime'] . '</td>';
+                $html1 = $html1 . ' </tr>';
+            }
+            return $html1;
+        }
+    }
+
+
+//    public function getDescendantTiles($nodeId){
+//        $productionData = $this->getPreviousTotalProductionAndDescendantData($nodeId);
+//        $pDarray = json_decode($productionData);
+////        echo $pDarray['totalProduction']['data'];
+//        print_r($pDarray);
+//        echo $productionData;
+//        var_dump($pDarray);
+//    }
+
+//    =============================ownerOrDepartmentalIndex Page Code FINISH==================================
 
 
 

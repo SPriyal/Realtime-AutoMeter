@@ -4,14 +4,15 @@
 
 		<div class=" pull-right">
 
-				<div id="remote">
-					{!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}
-					{!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg')) !!}
+				{{--<div id="remote">--}}
+					{{--{!! Form::open(array('url'=>'searchResult','method'=>'POST', 'files'=>true)) !!}--}}
+					{{--{!! Form::text('searchBox',null,array('placeholder' => 'Search','id'=>'inputSuccess', 'class' => 'form-control typeahead input-lg')) !!}--}}
 					{{--{!! Form::submit('Search', array('class'=>'btn btn-primary')) !!}--}}
-					{!!Form::close()!!}
-				</div></div>
+					{{--{!!Form::close()!!}--}}
+				{{--</div>--}}
+            </div>
 
-		<h3><b>{{$companyAndMeterNames[0]['companyName']}} >>> {{$companyAndMeterNames[0]['meterName']}}</b></h3>
+		<h4><b>{!!$breadcrumbs!!}</b></h4>
 
 
 		<div class="box box-default">
@@ -32,6 +33,7 @@
 							<div class="inner">
 								<h3>
 								    <b id="currentValue">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+
 								    <p id="currentValueDate">(Date Time)</p>
                                 </h3>
 
@@ -300,7 +302,7 @@
 								var feedbackLive ;
 								var idOfCurrentMeter = feedback[0].meter_id;
 								feedbackLive = $.ajax({
-									type: "POST",
+									type: "GET",
 									cache: false,
 									url: "/liveGraphValues/"+idOfCurrentMeter,
 //									data: idOfCurrentMeter,
@@ -419,7 +421,7 @@
 //										else
 //											location.reload();
 									}
-								}}, 3000);
+								}}, 30000);
 						}
 					}
 				},
@@ -533,7 +535,7 @@
 									parseFloat(feedback[j].bar)
 								]);
 							}
-							*/
+    							*/
 							if(parameterIdOfCurrentMeter == 1 || parameterIdOfCurrentMeter == 3){
                                 data.push([
                                     Number(Date.createFromMysql(feedback[j+1].DateTime)),

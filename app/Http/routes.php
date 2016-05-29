@@ -18,7 +18,17 @@ Route::get('home', 'HomeController@index');
 //==========================Testing purpose related routes BELOW===========================
 Route::get('/pV/{id}',['uses'=>'HomeController@PreviousValues']);       //Gives previously fetched values in JSON
 Route::get('random','HomeController@testing');
+Route::get('allData/{id}','HomeController@getPreviousTotalProductionAndDescendantData');
+
+Route::get('tiles/{id}','HomeController@getDescendantTiles');
 //==========================Testing purpose related routes FINISH===========================
+
+
+
+
+//==============================Owner based Index Page BELOW=======================================
+Route::get('liveData/{id}',['uses' => 'HomeController@getPreviousTotalProductionAndDescendantData']);
+//==============================Owner based Index Page BELOW=======================================
 
 
 
@@ -45,8 +55,8 @@ Route::post('/searchResult', 'SearchController@searchResult');
 
 
 //=================================Graph & Table related routes BELOW=============================================
-Route::post('liveGraphValues/{nodeId}',['uses' => 'HomeController@LiveValues']);    // gives live reading for selected node
-Route::post('/liveGraphValues', 'HomeController@LiveValues');   //gives live readings for default node
+Route::get('liveGraphValues/{nodeId}',['uses' => 'HomeController@LiveValues']);    // gives live reading for selected node
+Route::get('/liveGraphValues', 'HomeController@LiveValues');   //gives live readings for default node
 Route::get('/'.env('URL_ENTITY', 'auto').'/{c}', ['uses' =>'HomeController@indexForMeterFromHierarchy']);   //loads index page for selected node
 //=================================Graph & Table related routes FINISH=============================================
 
