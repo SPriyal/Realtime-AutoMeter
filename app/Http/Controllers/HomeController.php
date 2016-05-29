@@ -278,7 +278,7 @@ class HomeController extends Controller
     public function LiveValues($nodeId)
     {
 //        echo "id from client is ".$nodeId;
-        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 4 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 4 SECOND)'))->get();
+        $query =  Data::select('id','meter_id','parameter_id','value','DateTime')->where('meter_id','=',$nodeId)->where('DateTime','>=',DB::raw('DATE_SUB(NOW(),INTERVAL 45 SECOND)'))->where('DateTime','<=',DB::raw('DATE_ADD(NOW(),INTERVAL 45 SECOND)'))->get();
         return json_encode($query);
     }
     public function shiftCheck()
@@ -346,17 +346,20 @@ class HomeController extends Controller
             $i=0;
             foreach($descendantsBelowOneLevel as $descendant){
                 $leavesOfDescendant = $descendant->getLeaves()->all();
+                $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = 0;
+                $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = Carbon::now()->subDays($j)->format("Y-m-d");
+                $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'deptId' => $descendant['id'], 'value' => 0, 'dateTime' => Carbon::now()->subDays($j)->format("Y-m-d")];
                 foreach($leavesOfDescendant as $leaf){
                     if($leaf->parameter_id == 1) {
                         $data = Data::whereDate('DateTime', '=', Carbon::now()->subDays($j)->format("Y-m-d"))->where('meter_id', '=', $leaf->id)->orderBy('DateTime', 'desc')->first();
                         // TODO - Parameter is hard coded in this whole section.... It will work on one primary parameter....
                         $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = 0;
                         $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = Carbon::now()->subDays($j)->format("Y-m-d");
-                        $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => 0, 'dateTime' => Carbon::now()->subDays($j)->format("Y-m-d")];
+                        $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'deptId' => $descendant['id'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => 0, 'dateTime' => Carbon::now()->subDays($j)->format("Y-m-d")];
                         if ($data) {
                             $totalProduction += $data['value'];
                             $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['data'] = $totalProduction;
-                            $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime' => $data['DateTime']];
+                            $combinedData['descendants'][Carbon::now()->subDays($j)->format("Y-m-d")][$i] = ['deptName' => $descendant['name'], 'deptId' => $descendant['id'], 'meter_id' => $data['meter_id'], 'meter_name' => $leaf['name'], 'value' => $data['value'], 'dateTime' => $data['DateTime']];
                             $combinedData['totalProduction'][Carbon::now()->subDays($j)->format("Y-m-d")]['dateTime'] = $data['DateTime'];
                         }
                     }

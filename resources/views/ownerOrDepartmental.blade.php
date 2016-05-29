@@ -98,8 +98,8 @@
                     <div class="small-box bg-light-blue-gradient">
                         <div class="inner">
                             <h3>
-                                <b id="{{$descendant['deptName']}}_{{$descendant['meter_name']}}" >---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
-                                <p id="{{$descendant['deptName']}}_{{$descendant['meter_name']}}Date" >(Date Time)</p>
+                                <b id="{{$descendant['deptName']}}_{{$descendant['deptId']}}" >---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
+                                <p id="{{$descendant['deptName']}}_{{$descendant['deptId']}}Date" >(Date Time)</p>
                             </h3>
                             <p>{{$descendant['deptName']}}</p>
                         </div>
@@ -204,8 +204,10 @@
         for(i=0;i<descendants.length;i++){
             if(descendants[i].value != 0)
                 var percentageOfDescendant = parseFloat(descendants[i].value) / parseFloat(totalProduction.data)*100;
-            else
+            else{
+                percentageOfDescendant =0;
                 noDataTodayCounter++;
+            }
             departmentProductionpercentage.push({'deptName':descendants[i].deptName,'percentage':percentageOfDescendant});
         }
 
@@ -232,7 +234,7 @@
 
 //        --------------------initializing descendant tiles---------------------
         for(i=0;i<descendants.length;i++){
-            var tileIdOfDescendants = descendants[i].deptName + "_"+descendants[i].meter_name;
+            var tileIdOfDescendants = descendants[i].deptName + "_"+descendants[i].deptId;
             var tileValueOfDescendants = descendants[i].value;
             var tileDateIdOfDescendants = tileIdOfDescendants+"Date";
             var tileDateValueOfDescendants = descendants[i].dateTime;
@@ -273,7 +275,7 @@
 
         //        --------------------initializing descendant tiles with LIVE values---------------------
                 for(i=0;i<descendants.length;i++){
-                    var tileIdOfDescendants = descendants[i].deptName + "_"+descendants[i].meter_name;
+                    var tileIdOfDescendants = descendants[i].deptName + "_"+descendants[i].deptId;
                     var tileValueOfDescendants = descendants[i].value;
                     var tileDateIdOfDescendants = tileIdOfDescendants+"Date";
                     var tileDateValueOfDescendants = descendants[i].dateTime;
@@ -283,7 +285,7 @@
                 }
             }
         }
-    },3000);
+    },30000);
 
 //  =========================================Tiles LIVE Code FINISH===========================================
 
@@ -294,7 +296,7 @@
 
 //  =========================================Donut Chart Code BELOW===========================================
             // Build the chart
-            if(noDataTodayCounter == 0){
+            if(noDataTodayCounter != descendants.length ){
 
                 var chart = new Highcharts.Chart({
                     chart: {

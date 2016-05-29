@@ -32,7 +32,7 @@
 						<div class="small-box bg-aqua">
 							<div class="inner">
 								<h3>
-								    <b id="currentValue">---</b>
+								    <b id="currentValue">---</b><sup style="font-size: 20px" class="parameterUnit">---</sup>
 
 								    <p id="currentValueDate">(Date Time)</p>
                                 </h3>
@@ -302,7 +302,7 @@
 								var feedbackLive ;
 								var idOfCurrentMeter = feedback[0].meter_id;
 								feedbackLive = $.ajax({
-									type: "POST",
+									type: "GET",
 									cache: false,
 									url: "/liveGraphValues/"+idOfCurrentMeter,
 //									data: idOfCurrentMeter,
@@ -421,7 +421,7 @@
 //										else
 //											location.reload();
 									}
-								}}, 3000);
+								}}, 30000);
 						}
 					}
 				},
